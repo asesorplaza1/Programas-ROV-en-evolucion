@@ -1,0 +1,754 @@
+/*
+  Programa Esclavo
+
+  Modificado por asesorplaza1 en las diferentes fechas indicadas
+  Las primeras pruebas y cambios del código, se iniciaron en 2.016, debido a la cantidad de modificaciones
+  A partir de ahora 30/01/2020, se ponen las fechas y los cambios en la descripción del proyecto
+  Para facilitar la búsqueda de errores en los diferentes cambios del código
+
+  30/01/2020 ya se han comentado todas las líneas de control de la cámara y del LCD
+  Le añado 2 DHT22 y así estarán los 3 que me hacen falta
+  He borrado varias líneas de control de la cámara que no se va a utilizar
+
+  01/02/2020 le añado los controles del giroscopio facilitados por Dea de www.cambatronics.com
+
+  02/02/2020 le añado la orden para leer solo 1 vez X segundo el DHT22, truco de José Luis de
+  www.cambatronics.com
+  y se borran las líneas correspondientes al control de la cámara de video
+  No utilizadas por asesorplaza1, en esta modificación del proyecto original
+
+  04/02/2020 modifico las líneas de lectura de los sensores, porque hasta ahora solo me imprime en Monitor Serie el texto, no los datos
+
+  06/02/2020 se depura un poco el código, y se modifica el encabezado del código
+
+  08/02/2020 se corrige el error de lectura en los sensores, y se corrige la escritura del Monitor Serie
+
+  12/02/2020 para poder añadir cualquier código hay que seguir unas reglas especificas de programación
+  Se modifica la estructura del código siguiendo esas órdenes de programación, según la información obtenida y guardada
+  En la carpeta 01_UNIR_2_CODIGOS
+  Se crean varios bloques en el void loop, para el funcionamiento de cada uno de los sensores, eliminando los delay()
+
+  13/02/2020 se incluye el sensor de temperatura DS18B20, ayudado por DEA de www.cambatronics.com
+
+  16/02/2020  Se añade el sensor de distancia infrarrojo E18-D80NK, sin errores
+  y consigo adaptar un código para leer el sensor de presión SKU237545
+
+  08/03/2020 se conecta un relé en el pin 12 del Arduino Esclavo, para encender los focos de luz externos, no hace falta cambiar el código
+
+  26/03/2020 Se incluye la librería MPU6050, para controlar el giroscopio
+  Se arregla el envió de datos, separando los datos del Monitor Serie, y los datos que hay que enviar al Arduino Maestro,
+  iniciando dos puertos serie con las ordenes
+
+  Serial.begin(57600);     // Puerto Serie USB
+
+  Serial1.begin(57600);    // Puerto Serie en los pines 18 y 19
+
+  ETin.begin(details(rxdata), &Serial1);    // Comienza la recepción de datos a través de Serial, en los pines 18 y 19
+
+  ETout.begin(details(txdata), &Serial1);   // Comienza el envío de datos a través de Serial, en los pines 18 y 19
+
+  28/03/2020 Se incluyen el envió de todas las instrucciones del mando, para tener todos los botones operativos (no funciona)
+
+  03/04/2020 Se incluye la parte nueva del Giroscopio MPU6050, que muestra los 3 ejes de inclinación, más la temperatura del Giroscopio.
+  Se incluye el segundo sensor de presión
+
+  05/04/2020 se cambia el código del sensor infrarrojo E18D80NK, por uno mejor
+
+  11/04/2020 Corrijo el código según las instrucciones de mi amigo Atilano Belinchón
+
+  13/04/2020 Corrijo las lecturas y envió de datos del sensor de infrarrojos E18D80NK
+
+  15/04/2020 Se incluye el servo de dirección para accionarlo con los botones R1 y R2 del mando
+  según información obtenida de la pagina
+
+  https://arduparatodos.blogspot.com/2017/02/controlar-servomotor-con-arduino-varios.html
+
+  18/04/2020 Se cambian algunos " if ", por " else if ", para darle agilidad al código, siguiendo las instrucciones de DEA de www.cambatronics.com
+
+  Entre el día 24/03/2020 y el día 28/04/2020, se hacen varios cambios en el código para mejorarlo y conseguir que el mando funcione,
+  Siguiendo las instrucciones de bigbadbob en las publicaciones del foro
+
+  http://www.homebuiltrovs.com/rovforum/viewtopic.php?f=18&t=1908
+
+  A partir de la página 4
+
+  28/04/2020 Se corrige la ortografía de todo le texto que no son órdenes
+
+  03/05/2020 Se cambian las asignaciones de los pines, según el código de Github
+
+  Las nuevas asignaciones de pines son:
+
+  Salida de 3.3V a PIN rojo PS2
+  Pin 24 a PIN amarillo PS2 + resistencia 1k
+  Pin 23 a PIN naranja PS2
+  Pin 25 a PIN marrón PS2 + resistencia 1k
+  Pin 22 a PIN azul PS2
+
+  Se arregla el código para que me salga en el Maestro el estado de los focos, encendidos / apagados
+
+  04/05/2020 Se depura el código según los consejos de Bigbadbob de http://www.homebuiltrov.com
+
+  05/05/2020 Se incluye la Macro F, en todos los Serial.print, para reducir el consumo de memoria dinámica
+  Según los consejos de Bigbadbob de http://www.homebuiltrov.com, pero me da problemas
+
+  06/05/2020 Se depura el código para un mejor funcionamiento, según los consejos de Bigbadbob de http://www.homebuiltrov.com
+  y siguen los problemas con la Macro F
+
+  07/05/2020 Se depura el código para un mejor funcionamiento, según los consejos de Bigbadbob de http://www.homebuiltrov.com
+  y siguen los problemas con la Macro F
+
+  08/05/2020 Se corrigen los problemas de la Macro F, en todos los Serial.print de texto fijo
+  No se puede poner la Macro F, a los Serial.print de datos de los sensores
+  Y se consigue reducir el consumo de memoria dinámica considerablemente
+
+  09/05/2020 Se siguen corrigiendo líneas para la depuración del código, según los consejos de Bigbadbob de http://www.homebuiltrov.com
+  Pero siguen los problemas con el mando de la PS2
+
+  10/05/2020 Me doy cuenta de un error en la orden de encender los focos y lo corrijo
+  Pero el mando sigue sin funcionar como es debido
+
+  11/05/2020 Se modifican varias órdenes del control de los botones, pero el mando sigue sin funcionar correctamente
+
+  16/05/2020 Se hacen diversos cambios, segun los consejos de Tsanshon de www.foromodelismonaval.es
+
+
+
+
+
+
+
+  La versión original tomada como punto de partida es la siguiente
+
+  ROVPS2Control_Slavev8.ino
+  Hamish Trolove - 30 de marzo de 2016
+  www.techmonkeybusiness.com
+
+  Este boceto toma los comandos que se le envían desde la unidad maestra con el controlador PS2 conectado y lo convierte en comandos de motor,
+  Servo comandos, controles de luz, etc. Los datos se envían desde el Arduino (maestro) al ROV (esclavo) utilizando la biblioteca EasyTransfer de Bill Porter a través de un enlace en serie de 9600 baudios (anclaje de 100 m). La biblioteca MS5803_14 es de Luke Miller http://github.com/millerlp
+
+  Los datos enviados desde el maestro son configuraciones sin formato para el control ESC.
+
+  Este boceto está diseñado para un Arduino Nano con un solo puerto serie.
+
+  Yo lo estoy usando en un Mega 2560, y funcionaba, hasta que empecé a introducir sensores
+
+
+  Para la transmisión del video asesorplaza1 utilizara una Raspberry Pi 3 plus, una cámara USB, y el programa VCL Media Player
+
+  Se cambian estos sensores por obsoletos, se usan los sensores DHT22 y el giroscopio MPU6050
+
+  Conexión serial de comunicaciones: modificado por Asesorplaza1, el 26/03/2020, para separar los datos mandados entre Arduinos, de los datos a mandar al Monitor serie
+  19 superior (TX) a ROV 18 (RX) Conexión serial: 18 superior (RX) a ROV 19 (TX)
+  Conecte el GND en ambos
+
+  Tenga en cuenta que los ESC ya se habrán programado en este punto del proyecto.
+
+  Los datos de voltaje interno, rumbo, profundidad y temperatura interna se envían a través del enlace serie de regreso al maestro
+  Para su visualización en una pantalla LCD de 16x2.
+  La pantalla LCD de 16x2, se cambiara por una pantalla Nextion básica de 5"
+
+  Se cambia este sensor por obsoleto, se usa el giroscopio MPU 6050
+
+  Ver también como se desarrolla el proyecto original con los siguientes códigos:
+  HoryzonTrigger.ino, ROVPS2Control_Masterv0.ino,
+  ROVDoNothing.ino, ROVSubBv0.ino, DigitalCompassv2.ino,
+  PTLoggerv4.ino y TMP36_Temperature_Sensor.ino.
+  En la página www.techmonkeybusiness.com
+
+*/
+
+
+
+// Se ponen todas las librerías juntas
+
+#include <arduino.h>
+#include <Servo.h>              // librería para gestionar los servos y los ESC
+#include <EasyTransfer.h>       // librería Easy Transfer de Bill Porter
+#include <Adafruit_Sensor.h>    // librería para gestionar el sensor de temperatura DHT22
+#include <DHT.h>                // librería para el sensor DHT 22
+#include <OneWire.h>            // librería para el sensor de temperatura DS18B20
+#include <DallasTemperature.h>  // Librería para el sensor de temperatura DS18B20
+#include <MPU6050.h>            // librería i2c para el Giroscopio ***
+#include <PS2X_lib.h>           // Librería para el mando PS2
+#include <ESC.h>                // Librería para los ESC
+
+PS2X ps2x;                          // Genera un objeto llamado ps2x
+EasyTransfer ETin, ETout;           // Genera los dos objetos de transferencia fácil para Comunicación bidireccional
+
+const int pinDatosDQ = 28;                       // Pin donde se conecta el bus 1-Wire para los sensores de temperatura
+OneWire oneWireObjeto(pinDatosDQ);               // Instancia a las clases OneWire y DallasTemperature
+DallasTemperature sensorDS18B20(&oneWireObjeto); // Instancia a las clases OneWire y DallasTemperature
+
+// #define F(string_literal) (reinterpret_cast<const __FlashStringHelper *>(PSTR(string_literal)))
+
+// Se pone toda la identificación de los DHT22 junta
+
+DHT dht(22, DHT22);    // Seleccionamos el pin y tipo de sensor del casco
+DHT dht1(24, DHT22);   // Seleccionamos el pin y tipo de sensor del motor derecho
+DHT dht2(26, DHT22);   // Seleccionamos el pin y tipo de sensor del motor izquierdo
+
+// Se pone toda la identificación de los ESC y los Servos junta
+
+ESC ESCVL(8, 1000, 2000, 500);           // Genera objeto ESC vertical izquierdo en el pin 8, con el minimo en 1000, maximo en 2000, y armado en 500
+ESC ESCVR(7, 1000, 2000, 500);           // Genera objeto ESC vertical derecho en el pin 7, con el minimo en 1000, maximo en 2000, y armado en 500
+ESC ESCHL(6, 1000, 2000, 500);           // Genera Objeto ESC Horizontal Izquierdo en el pin 6, con el minimo en 1000, maximo en 2000, y armado en 500
+ESC ESCHR(5, 1000, 2000, 500);           // Genera objeto ESC Horizontal Derecho, en el pin 5, con el minimo en 1000, maximo en 2000, y armado en 500
+Servo ServoInmersion;           // Genera un objeto llamado ServoDireccion
+int angulo = 90;                // Variable para el ángulo, inicia en 90º
+
+// Se pone toda la identificación de los LED indicadores de batería junta
+
+const int RedLEDpin = 13;  // El pin del indicador LED es 13.
+const int HeadLts = 34;    // El control de los faros está en el pin 34
+const int Voltpin = A7;    // pin analógico utilizado para leer el voltaje de la batería
+const int yelLEDpin = 38;  // Pin utilizado como chivato de recibir datos del mando
+
+// Se pone toda la identificación del sistema de refrigeración junta
+
+const int Refrigeracion = 34; // el pin utilizado para encender la bomba de refrigeración es el 34
+const int TwarnLEDpin = 36;   // El pin utilizado para el LED de alarma de temperatura es el 36
+
+// Se pone toda la identificación del MPU6050 junta
+
+const int MPU6050_addr = 0x68; // Direction I2C del MPU6050
+int16_t AccX, AccY, AccZ, Temp, GyroX, GyroY, GyroZ;
+
+// Se pone toda la parte de lectura de la batería junta
+
+int volts;                          // variable para leer el voltaje del pin analógico
+const float RefVolts = 5.0;         // Voltaje de referencia de la placa de 5 voltios en Nano
+const float ResistFactor = 319.68;  // Calculado a partir de 1023.0 * (R2 / (R1 + R2)
+// Donde R1 = 2200 ohmios y R2 = 1000 ohmios para un voltaje máximo de 15 V.
+
+// Se pone toda la parte del sensor E18D80NK
+
+int pinSensorE18D80NK = 30;   // Se genera el sensor E18D80NK en el pin 30
+int pinLedColision = 31;      // Se genera el LED de aviso de peligro colisión en el pin 31
+boolean objectDetect = false; // Marca para mostrar si se ha detectado un objeto
+
+// Se generan todos los botones del mando
+
+boolean PSB_PAD_UPstate = false;     // Genera el botón Izquierda arriba
+boolean PSB_PAD_DOWNstate = false;   // Genera el botón Izquierda abajo al Esclavo
+boolean PSB_PAD_LEFTstate = false;   // El botón Izquierda izquierdo ya esta usado para encender los focos
+boolean PSB_PAD_RIGHTstate = false;  // Genera el botón Izquierda derecho
+boolean PSB_BLUEstate = false;       // Genera el botón Cruz azul
+boolean PSB_GREENstate = false;      // Genera el botón Triangulo verde
+boolean PSB_PINKstate = false;       // Genera el botón Cuadrado rosa
+boolean PSB_REDstate = false;        // Genera el botón Circulo rojo
+boolean PSB_L1state = false;         // Genera el botón Izquierda delante arriba
+boolean PSB_L2state = false;         // Genera el botón Izquierda delante abajo
+boolean PSB_L3state = false;         // Genera el botón Palo izquierdo abajo
+boolean PSB_R1state = false;         // Genera el botón Derecha delante arriba
+boolean PSB_R2state = false;         // Genera el botón Derecha delante abajo
+boolean PSB_R3state = false;         // Genera el botón Palo derecho abajo
+
+// Se genera un pin de entrada de datos para el sensor de presión SKU237545
+
+int SensorSKU237545_I = 32;  // Sensor de presión Interno
+int SensorSKU237545_E = 33;  // Sensor de presión Externo
+
+int intervalodatos = 1000;  // Hace que solo se envíen los valores 1 vez por segundo
+// int auxMillis = 0;          // Indica el valor del intervalo de tiempo
+
+// Se pone toda la estructura de recepción de datos junta
+
+struct RECEIVE_DATA_STRUCTURE {
+  int upLraw = 0;   // Variables para transportar los datos sin procesar reales de los ESC
+  int upRraw = 0;
+  int HLraw = 0;
+  int HRraw = 0;
+  volatile boolean PSB_PAD_UPstate;     // Recibe lectura del botón Izquierda arriba del Maestro
+  volatile boolean PSB_PAD_DOWNstate;   // Recibe lectura del botón Izquierda abajo del Maestro
+  volatile boolean PSB_PAD_RIGHTstate;  // Recibe lectura del botón Izquierda derecha del Maestro
+  volatile boolean PSB_PAD_LEFTstate;   // Recibe lectura del botón Izquierda Izquierda del Maestro
+  volatile boolean PSB_BLUEstate;       // Recibe lectura del botón Cruz azul del Maestro
+  volatile boolean PSB_GREENstate;      // Recibe lectura del botón Triangulo verde del Maestro
+  volatile boolean PSB_PINKstate;       // Recibe lectura del botón Cuadrado rosa del Maestro
+  volatile boolean PSB_REDstate;        // Recibe lectura del botón Circulo rojo del Maestro
+  volatile boolean PSB_L1state;         // Recibe lectura del botón Delante izquierda arriba del Maestro
+  volatile boolean PSB_L2state;         // Recibe lectura del botón Delante izquierda abajo del Maestro
+  volatile boolean PSB_L3state;         // Recibe lectura de presión Palo izquierda del Maestro
+  volatile boolean PSB_R1state;         // Recibe lectura del botón Delante derecha arriba del Maestro
+  volatile boolean PSB_R2state;         // Recibe lectura del botón Delante derecha abajo del Maestro
+  volatile boolean PSB_R3state;         // Recibe lectura de presión Palo izquierdo del Maestro
+  volatile boolean LEDHdlts;            // Luces LED encendidas / apagadas
+};
+
+// Se pone toda la identificación del envío de datos junta
+
+struct  SEND_DATA_STRUCTURE {
+  int BattVolt;             // Manda mensaje de datos de voltaje de batería al maestro.
+  int t;                    // Manda mensaje de datos de temperatura interior del ROV al Maestro
+  int t1;                   // Manda mensaje de datos de temperatura del motor derecho al Maestro
+  int t2;                   // Manda mensaje de datos de temperatura del motor izquierdo al Maestro
+  int ROVDepth;             // Manda mensaje de datos de lectura de profundidad de ROV (m)
+  int ROVHDG;               // Manda mensaje de Dirección del ROV (grados)
+  int h;                    // Manda mensaje de humedad al Maestro
+  int h1;                   // Manda mensaje de humedad al Maestro del motor derecho
+  int h2;                   // Manda mensaje de humedad al Maestro del motor izquierdo
+  int AccX;                 // Manda mensaje de datos de inclinación del eje X al Maestro
+  int AccY;                 // Manda mensaje de datos de inclinación del eje Y al Maestro
+  int AccZ;                 // Manda mensaje de datos de de inclinación del eje Z al Maestro
+  int Temp;                 // Manda mensaje de datos de temperatura del giroscopio al Maestro
+  int GyroX;                // Manda mensaje de datos de aceleración en el eje X al Maestro
+  int GyroY;                // Manda mensaje de datos de aceleración en el eje Y al Maestro
+  int GyroZ;                // Manda mensaje de datos de aceleración en el eje Z al Maestro
+  int E18D80NK;             // Manda mensaje de lectura del sensor infrarrojo E18-D80NK
+  int pinLedColision;       // Manda mensaje de encender alarma de colisión
+  int sensorDS18B20;        // Manda mensaje de lectura del sensor de temperatura DS18B20
+  int pressure_bar;         // Manda mensaje de lectura del sensor de presión SKU237545 Interno en Bares
+  int pressure_psi;         // Manda mensaje de lectura del sensor de presión SKU237545 Interno en PSI
+  int pressure_bar1;        // Manda mensaje de lectura del sensor de presión SKU237545 Interno en Bares
+  int pressure_psi1;        // Manda mensaje de lectura del sensor de presión SKU237545 Interno en PSI
+};
+
+RECEIVE_DATA_STRUCTURE rxdata; // Dar un nombre al grupo de datos recibidos
+SEND_DATA_STRUCTURE txdata;    // Dar un nombre al grupo de datos enviados
+
+void setup()
+{
+
+  // Se pone todo lo referente a la comunicación junta
+
+  Wire.begin ();                           // Comienza la comunicación i2c
+
+  Serial.begin(9600);                       // Comienza la Comunicación Serie para hablar con el ordenador a 9600 baudios
+  Serial1.begin(9600);                     // Comienza la Comunicación Serie en el puerto 1, pines 18 y 19, para hablar con el Arduino Maestro
+  Serial1.flush();                         // Depura la información del Puerto Serie
+  ETin.begin(details(rxdata), & Serial1);  // Comienza la recepción de datos a través de Serial, en los pines 18 y 19
+  ETout.begin(details(txdata), & Serial1); // Comienza el envío de datos a través de Serial, en los pines 18 y 19
+  sensorDS18B20.begin();                   // Comienza el trabajo del sensor DS18B20
+
+  // Se define el inicio del LED y de los Focos
+
+  pinMode(RedLEDpin, OUTPUT);
+  pinMode(HeadLts, OUTPUT);
+  digitalWrite(HeadLts, LOW);  // Establezca los faros en Off
+  digitalWrite(RedLEDpin, LOW);
+
+  // Se inician los ESC y se define en que pin actúa cada uno
+  ESCVL.arm();         // Inicia el ESCVL
+  ESCVR.arm();         // Inicia el ESCVR
+  ESCHL.arm();         // Inicia el ESCHL
+  ESCHR.arm();         // Inicia el ESCHR
+
+  // Esto hay que comprobarlo
+  // Debido a problemas con el ESC que reconoce el máximo posición en la configuración predeterminada, las cifras después de
+  // El número de pin son las señales de microsegundos para el mínimo y máximo que el ESC reconocerá, 600 y 2250 trabajo.
+
+  ServoInmersion.attach(4); // Adjunte el servo de dirección al pin 4
+  ServoInmersion.write(90); // Posiciona el servo inicialmente en la mitad (90°)
+
+  // Se inician y se manda a imprimir la prueba de funcionamiento de los sensores DHT22
+  dht.begin();  // Inicia el trabajo del sensor DHT22 del casco
+  Serial.println (F(" \n Probando sensor DHT22 casco!"));
+  dht1.begin(); // Inicia el trabajo del sensor DHT22 del motor derecho
+  Serial.println (F(" \n Probando sensor DHT22 motor DR!"));
+  dht2.begin(); // Inicia el trabajo del sensor DHT22 del motor izquierdo
+  Serial.println (F(" \n Probando sensor DHT22 motor IZ!"));
+
+  // Se inician los pines del sensor y de la alarma
+  pinMode(pinSensorE18D80NK, INPUT_PULLUP); // Definir pin como sensor de entrada
+  pinMode(pinLedColision, OUTPUT); // Definir pin como SALIDA para ACTION
+
+  // Se inicia el pin del sensor de presión SKU237545 Interno
+  pinMode (SensorSKU237545_I, INPUT);
+
+  // Se inicia el pin del sensor de presión SKU237545 Externo
+  pinMode (SensorSKU237545_E, INPUT);
+
+  // Proceso para iniciar el giroscopio MPU6050
+  Wire.begin();
+  Wire.beginTransmission(MPU6050_addr);
+  Wire.write(0x6B);
+  Wire.write(0);
+  Wire.endTransmission(true);
+
+  delay (200);
+}
+
+void loop ()
+{
+
+  void loop_ESC();             // Bloque de trabajo de los ESC de los motores
+  void loop_Luces();           // Bloque de trabajo de los focos
+  void loop_Voltaje();         // Bloque de trabajo para medir el voltaje de la batería
+  void loop_DHT22();           // Bloque de trabajo de los sensores de temperatura y humedad DHT22
+  void loop_MPU6050();         // Bloque de trabajo del Giroscopio
+  void loop_SensorE18D80NK();  // Bloque de trabajo del sensor de infrarrojos
+  void loop_DS18B20();         // Bloque de trabajo del sensor de temperatura DS18B20
+  void loop_SKU237545_I();     // Bloque de trabajo del sensor de presión interno
+  void loop_SKU237545_E();     // Bloque de trabajo del sensor de presión externo
+  void loop_ServoInmersion();  // Bloque de trabajo del servo
+
+
+  ETout.sendData ();     // Envía los datos al puerto serie para el ROV Arduino
+
+  for (int i = 0; i < 5; i++) { // Cambia el estado de enviar / recibir datos cada 5 segundos
+
+  (ETin.receiveData());    // Recibe los datos al puerto serie para el ROV
+  
+  PSB_PAD_UPstate = (rxdata.PSB_PAD_UPstate);         // Recibe lectura del botón Izquierda arriba al Esclavo
+  PSB_PAD_DOWNstate = (rxdata.PSB_PAD_DOWNstate);     // Recibe lectura del botón Izquierda abajo al Esclavo
+  PSB_PAD_LEFTstate = (rxdata.PSB_PAD_LEFTstate);     // Recibe lectura del botón Izquierda Izquierda al Esclavo
+  PSB_PAD_RIGHTstate = (rxdata.PSB_PAD_RIGHTstate);   // Recibe lectura del botón Izquierda derecho al Esclavo
+  PSB_BLUEstate = (rxdata.PSB_BLUEstate);             // Recibe lectura del botón Cruz azul al Esclavo
+  PSB_GREENstate = (rxdata.PSB_GREENstate);           // Recibe lectura del botón Triangulo verde al Esclavo
+  PSB_PINKstate = (rxdata.PSB_PINKstate);             // Recibe lectura del botón Cuadrado rosa al Esclavo
+  PSB_REDstate = (rxdata.PSB_REDstate);               // Recibe lectura del botón Circulo rojo al Esclavo
+  PSB_L1state = (rxdata.PSB_L1state);                 // Recibe lectura del botón Izquierda delante arriba al Esclavo
+  PSB_L2state = (rxdata.PSB_L2state);                 // Recibe lectura del botón Izquierda delante abajo al Esclavo
+  PSB_L3state = (rxdata.PSB_L3state);                 // Recibe lectura del botón Palo izquierdo abajo al Esclavo
+  PSB_R1state = (rxdata.PSB_R1state);                 // Recibe lectura del botón Derecha delante arriba al Esclavo
+  PSB_R2state = (rxdata.PSB_R2state);                 // Recibe lectura del botón Derecha delante abajo al Esclavo
+  PSB_R3state = (rxdata.PSB_R3state);                 // Recibe lectura del botón Palo derecho abajo al Esclavo
+  }
+  // No me deja generar un bloque de trabajo para los botones del mando
+  // Por eso los pongo dentro del void loop genérico
+
+  if (rxdata.PSB_PAD_UPstate)
+    // Si presionamos el botón izquierda arriba
+  {
+    digitalWrite(yelLEDpin, HIGH);
+    // Enciende el Led Amarillo
+  }
+
+  if (rxdata.PSB_PAD_DOWNstate)
+    // Si presionamos el botón izquierda abajo
+  {
+    digitalWrite(yelLEDpin, HIGH);
+    // Enciende el Led Amarillo
+  }
+
+  if (rxdata.PSB_PAD_RIGHTstate)
+    // Si presionamos el botón izquierda derecha
+  {
+    digitalWrite(yelLEDpin, HIGH);
+    // Enciende el Led Amarillo
+  }
+
+  if (rxdata.PSB_GREENstate)
+    // Si presionamos triangulo verde
+  {
+    digitalWrite(yelLEDpin, HIGH);
+    // Enciende el Led Amarillo
+  }
+
+  if (rxdata.PSB_REDstate)
+    // Si presionamos el círculo rojo
+  {
+    digitalWrite(yelLEDpin, HIGH);
+    // Enciende el Led Amarillo
+  }
+
+  if (rxdata.PSB_BLUEstate)
+    // Si presionamos el cruz azul
+  {
+    digitalWrite(yelLEDpin, HIGH);
+    // Enciende el Led Amarillo
+  }
+
+  if (rxdata.PSB_PINKstate)
+    // Si presionamos el cuadrado rosa
+  {
+    digitalWrite(yelLEDpin, HIGH);
+    // Enciende el Led Amarillo
+  }
+
+  if (rxdata.PSB_L1state)
+    // Si presionamos el botón L1
+  {
+    digitalWrite(yelLEDpin, HIGH);
+    // Enciende el Led Amarillo
+  }
+
+  if (rxdata.PSB_L2state)
+    // Si presionamos el botón L2
+  {
+    digitalWrite(yelLEDpin, HIGH);
+    // Enciende el Led Amarillo
+  }
+
+  if (rxdata.PSB_R1state)
+    // Si presionamos el botón R1
+  {
+    // Enciende / apaga las luces
+    digitalWrite(yelLEDpin, HIGH);
+    // Enciende el Led Amarillo
+  }
+
+  if (rxdata.PSB_R2state)
+    // Si presionamos el botón R2
+  {
+    // Enciende / apaga las luces
+    digitalWrite(yelLEDpin, HIGH);
+    // Enciende el Led Amarillo
+  }
+
+  if (rxdata.PSB_L3state)
+    // Si presionamos el joystick izquierdo hacia abajo
+  {
+    digitalWrite(yelLEDpin, HIGH);
+    // Enciende el Led Amarillo
+  }
+
+  if (rxdata.PSB_R3state)
+    // Si presionamos el joystick derecho hacia abajo
+  {
+    digitalWrite(yelLEDpin, HIGH);
+    // Enciende el LED Amarillo
+  }
+
+}
+
+void loop_ESC() { // Bloque de trabajo de los ESC de los motores
+
+  // Haremos algo correctamente con los datos devueltos en un
+  ESCVL.speed(rxdata.upLraw);   // Establezca la señal ESCVL en la posición del acelerador definida.
+  ESCVR.speed(rxdata.upRraw);   // Establezca la señal ESCVR en la posición del acelerador definida.
+  ESCHL.speed(rxdata.HLraw);    // Establezca la señal ESCHL en la posición del acelerador definida.
+  ESCHR.speed(rxdata.HRraw);    // Establezca la señal ESCHR en la posición del acelerador definida.
+
+}
+
+void loop_ServoInmersion() {         // Bloque de trabajo del Servo de Inmersión
+
+  if (rxdata.PSB_R1state == LOW)
+    // Aumenta el ángulo mientras se mantenga presionado
+  {
+    angulo++;
+    if (angulo >= 180)
+    {
+      angulo = 180;
+      // El ángulo no aumenta más allá de 180 grados
+      Serial.print (F(" \n Subiendo ROV a superficie "));
+    }
+  }
+  else if (rxdata.PSB_R2state == LOW)
+    // Disminuye el ángulo mientras se mantenga presionado
+  {
+    angulo--;
+    if (angulo <= 0)
+    {
+      angulo = 0;
+      // El ángulo no disminuye mas allá de 0 grados
+      Serial.print (F("\n Inmersion ROV a profundidad "));
+    }
+  }
+  ServoInmersion.write(angulo);
+  // Manda el ángulo al servo dependiendo del pulsador presionado
+  //  delay(10);
+}
+
+void loop_Luces() { // Bloque de trabajo de los focos
+  digitalWrite(HeadLts, rxdata.LEDHdlts);
+  // Enciende los faros en función del retraso de los datos del mensaje
+  if (rxdata.LEDHdlts > 0) {
+    digitalWrite(HeadLts, LOW);
+    Serial.print (F(" \n Focos apagados "));
+  }
+  else {
+    (rxdata.LEDHdlts < 0);
+    digitalWrite(HeadLts, HIGH);
+    Serial.print (F(" \n Focos encendidos "));
+  }
+}
+
+void loop_Voltaje() { // Bloque de trabajo de medición de voltaje de la batería
+
+  volts = analogRead(Voltpin) / ResistFactor * RefVolts * 10; // Lee el voltaje
+  // De la batería a través del divisor de voltaje. Factor de 10 utilizado
+  // Para ayudar a lograr un número entero con una precisión de 0.1V.
+  // Factor 10 utilizado para obtener precisión adicional del valor entero y luego se muestra con 1 decimal
+  txdata.BattVolt = volts;  // Enviar de vuelta el voltaje de la batería a bordo.
+  Serial.print (F(" \n Voltaje del ROV = "));
+  Serial.print(volts);
+
+}
+
+void loop_DHT22() { // Bloque de trabajo de los sensores DHT22
+
+  float h = dht.readHumidity();
+  // Lectura de Humedad desde el sensor DHT22 del interior del ROV
+  float t = dht.readTemperature();
+  // Lectura de Temperatura desde el sensor DHT22 del interior del ROV
+  float h1 = dht1.readHumidity();
+  // Lectura de Humedad desde el sensor DHT22 del motor derecho
+  float t1 = dht1.readTemperature();
+  // Lectura de Temperatura desde el sensor DHT22 del motor derecho
+  float h2 = dht2.readHumidity();
+  // Lectura de Humedad desde el sensor DHT22 del motor izquierdo
+  float t2 = dht2.readTemperature();
+  // Lectura de Temperatura desde el sensor DHT22 del motor izquierdo
+  int intervaloMedidas = 1000;
+  // Hace que solo se lean los valores 1 vez por segundo
+  unsigned long auxMillis = 0;
+  // Indica el valor del intervalo de tiempo
+
+  // Comprueba si hay fallo en todas las lecturas y sale rápido y prueba otra vez
+  if (isnan(h) || isnan(t)) {
+    Serial.print (F(" \n Fallo de lectura desde el sensor DHT del Casco!"));
+    return;
+  }
+  else if (isnan(h1) || isnan(t1)) {
+    Serial.print (F(" \n Fallo de lectura desde el sensor DHT del motor DR!"));
+    return;
+  }
+  else if (isnan(h2) || isnan(t2)) {
+    Serial.print (F(" \n Fallo de lectura desde el sensor DHT del motor IZ!"));
+    return;
+  }
+  else if (( millis() - auxMillis) > intervaloMedidas) {
+    txdata.t = t;   // Envía al Maestro la temperatura leída en el casco
+    txdata.h = h;   // Envía al Maestro la humedad leída en el casco
+    txdata.t1 = t1; // Envía al Maestro la temperatura leída en el motor derecho
+    txdata.h1 = h1; // Envía al Maestro la humedad leída en el motor derecho
+    txdata.t2 = t2; // Envía al Maestro la temperatura leída en el motor izquierdo
+    txdata.h2 = h2; // Envía al Maestro la humedad leída en el motor izquierdo
+    auxMillis = millis();
+  }
+  else if (t > 40 || t1 > 40 || t2 > 40)
+  {
+    // Si la temperatura de cualquiera de los sensores DHT22 es demasiado alta (más de 40 grados C)
+    // Enciende el LED de advertencia
+    digitalWrite(TwarnLEDpin, HIGH);
+    // Enciende la bomba de refrigeración
+    digitalWrite(Refrigeracion, HIGH);
+    // Escribe el texto
+    Serial.print (F(" \n TEMPERATURA ELEVADA !"));
+  }
+  Serial.print (F(" \n Temperatura en el casco = "));
+  Serial.print (t);
+  Serial.print (F(" *C "));
+  Serial.print (F(" \n Temperatura en el motor DR = "));
+  Serial.print (t1);
+  Serial.print (F(" *C1 "));
+  Serial.print (F(" \n Temperatura en el motor IZ = "));
+  Serial.print (t2);
+  Serial.print (F(" *C2 "));
+  Serial.print (F(" \n Humedad en el Casco = "));
+  Serial.print (h);
+  Serial.print (F(" %\t"));
+  Serial.print (F(" \n Humedad en el motor DR = "));
+  Serial.print (h1);
+  Serial.print (F(" %\t"));
+  Serial.print (F(" \n Humedad en el motor IZ = "));
+  Serial.print (h2);
+  Serial.print (F(" %\t"));
+
+}
+
+void loop_MPU6050() {  // Bloque de trabajo del giroscopio
+
+  Wire.beginTransmission(MPU6050_addr);
+  Wire.write(0x3B);
+  Wire.endTransmission(false);
+  Wire.requestFrom(MPU6050_addr, 14, true);
+  AccX = Wire.read() << 8 | Wire.read();
+  AccY = Wire.read() << 8 | Wire.read();
+  AccZ = Wire.read() << 8 | Wire.read();
+  Temp = Wire.read() << 8 | Wire.read();
+  GyroX = Wire.read() << 8 | Wire.read();
+  GyroY = Wire.read() << 8 | Wire.read();
+  GyroZ = Wire.read() << 8 | Wire.read();
+
+  txdata.AccX = AccX;
+  txdata.AccY = AccY;
+  txdata.AccZ = AccZ;
+  txdata.Temp = Temp;
+  txdata.GyroX = GyroX;
+  txdata.GyroY = GyroY;
+  txdata.GyroZ = GyroZ;
+
+  Serial.print (F(" \n Inclinación del eje X del ROV = "));
+  Serial.print (AccX);
+  Serial.print (F(" \n Inclinación del eje Y del ROV = "));
+  Serial.print (AccY);
+  Serial.print (F(" \n Inclinación del eje Z del ROV = "));
+  Serial.print (AccZ);
+  Serial.print (F(" \n Temperatura del Giro MPU6050 = "));
+  Serial.print (Temp / 340.00 + 36.53);
+  Serial.print (F(" \n Aceleración del Giro MPU6050 = "));
+  Serial.print (GyroX);
+  Serial.print (F(" \n Aceleración del Giro MPU6050 = "));
+  Serial.print (GyroY);
+  Serial.print (F(" \n Aceleración del Giro MPU6050 = "));
+  Serial.print(GyroZ);
+
+  // Serial.print(" \n Dirección del ROV = ");
+  //  Serial.print(rxdata.ROVHDG);  // muestra la dirección del ROV en una brújula
+
+  Wire.endTransmission(MPU6050_addr); //
+
+}
+
+void loop_SensorE18D80NK() { // Bloque de trabajo del sensor infrarrojo
+
+  int E18D80NK = digitalRead(pinSensorE18D80NK); // leer el Sensor
+
+  if (E18D80NK > 0) {
+    Serial.println (F(" \n Todo despejado"));
+    digitalWrite(pinLedColision, LOW); // encender el LED de peligro
+  }
+  else {
+    Serial.println (F(" \n Peligro Objeto detectado"));
+    digitalWrite(pinLedColision, HIGH); // Apagar el LED de peligro
+  }
+  txdata.E18D80NK = E18D80NK;
+}
+
+void loop_DS18B20() {  // Bloque de trabajo del sensor de temperatura DS18B20
+
+  sensorDS18B20.requestTemperatures();
+  Serial.print (F("\n Temperatura sensor DS18B20 = "));
+  Serial.print (sensorDS18B20.getTempCByIndex(0));
+  Serial.print (F(" ºC"));
+  txdata.sensorDS18B20 = sensorDS18B20.getTempCByIndex(0);
+}
+
+void loop_SKU237545_I() { // Bloque de trabajo del sensor de presión interno
+
+  SensorSKU237545_I = analogRead(32);
+  float voltage = (SensorSKU237545_I * 5.0) / 1024.0;
+  float pressure_pascal = (3.0 * ((float)voltage - 0.475)) * 1000000.0;  //calibrar aquí
+  float pressure_bar = pressure_pascal / 10e5;
+  float pressure_psi = pressure_bar * 14.5038;
+  Serial.print (F(" \n Valor del Sensor de Presión Interno =  "));
+  Serial.print (SensorSKU237545_I);
+  Serial.print (F(" \n Presión en Bar = "));
+  Serial.print (pressure_bar);
+  Serial.print (F("    bars"));
+  Serial.print (F(" \n Presión en PSI = "));
+  Serial.print (pressure_psi);
+  Serial.print (F("   psi"));
+  txdata.pressure_bar = pressure_bar;
+  txdata.pressure_psi = pressure_psi;
+}
+
+void loop_SKU237545_E() {  // bloque de trabajo del sensor de presión externo
+
+  SensorSKU237545_E = analogRead(32);
+  float voltage1 = (SensorSKU237545_E * 5.0) / 1024.0;
+  float pressure_pascal1 = (3.0 * ((float)voltage1 - 0.475)) * 1000000.0;  //calibrar aquí
+  float pressure_bar1 = pressure_pascal1 / 10e5;
+  float pressure_psi1 = pressure_bar1 * 14.5038;
+  Serial.print (F(" \n Valor del Sensor de Presión Externo = "));
+  Serial.print (SensorSKU237545_E);
+  Serial.print (F(" Presión en Bar = "));
+  Serial.print (pressure_bar1);
+  Serial.print (F("    bars"));
+  Serial.print (F(" \n Presión en PSI = "));
+  Serial.print (pressure_psi1);
+  Serial.print (F("   psi"));
+  Serial.print (F(" \n Profundidad = "));
+  txdata.pressure_bar1 = pressure_bar1;
+  txdata.pressure_psi1 = pressure_psi1;
+
+  // Serial.print(rxdata.ROVDepth);
+  // Muestra en el Display la profundidad del ROV en metros
+
+
+
+
+}
