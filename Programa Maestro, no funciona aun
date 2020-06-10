@@ -1,0 +1,589 @@
+/*
+  Programa Maestro
+
+  Modificado por asesorplaza1 en las diferentes fechas indicadas
+  Las primeras pruebas y cambios del código, se iniciaron en 2.016, debido a la cantidad de modificaciones
+  A partir de ahora 30/01/2020, se ponen las fechas y los cambios en la descripción del proyecto
+  Para facilitar la búsqueda de errores en los diferentes cambios del código
+
+  30/01/2020 ya se han comentado todas las líneas de control de la cámara y del LCD
+  Le añado 2 DHT22 y así estarán los 3 que me hacen falta
+  He borrado varias líneas de control de la cámara que no se va a utilizar
+
+  01/02/2020 Le añado los controles del giroscopio facilitados por Dea de www.cambatronics.com
+
+  02/02/2020 No hace falta modificar nada porque ya viene desde el Esclavo solo 1 lectura del sensor X segundo
+
+  04/02/2020 Modifico las líneas de lectura de los sensores, porque hasta ahora solo me imprime en Monitor Serie el texto, no los datos
+
+  06/02/2020 Se depura un poco el código, y se modifica el encabezado del código
+
+  08/02/2020 Se corrige el error de lectura en los sensores, y se corrige la escritura del Monitor Serie
+
+  12/02/2020 Para poder añadir cualquier código hay que seguir unas reglas especificas de programación
+  Se modifica la estructura del código siguiendo esas órdenes de programación, según la información obtenida y guardada en la carpeta 01_UNIR_2_CODIGOS
+  Se crean varios bloques en el void loop, para el funcionamiento de cada uno de los sensores, eliminando los delay()
+  Se añade el sensor de distancia infrarrojo E18-D80NK, sin errores
+
+  13/02/2020 Se incluye la lectura del sensor de temperatura DS18B20
+
+  16/02/2020  Se añade la lectura del sensor de distancia infrarrojo E18-D80NK, sin errores
+  Y consigo adaptar un código para leer el sensor de presión SKU237545
+
+  08/03/2020 Se conecta un relé en el pin 12 del Arduino Esclavo, para encender los focos de luz externos, no hace falta cambiar el código
+
+  26/03/2020 Se arregla el envío de datos, separando los datos del Monitor Serie, y los datos que hay que enviar al Arduino Maestro,
+  Iniciando dos puertos serie con las órdenes
+
+  Serial.begin(57600);     // Puerto Serie USB
+
+  Serial1.begin(57600);    // Puerto Serie en los pines 18 y 19
+
+  ETin.begin(details(rxdata), &Serial1);    // Comienza la recepción de datos a través de Serial, en los pines 18 y 19
+
+  ETout.begin(details(txdata), &Serial1);   // Comienza el envío de datos a través de Serial, en los pines 18 y 19
+
+  En el Esclavo se incluye una librería específica para el giroscopio MPU6050
+
+  28/03/2020 Se incluyen el envío de todas las instrucciones del mando, para tener todos los botones operativos
+
+  03/04/2020 Se incluye la parte nueva del Giroscopio MPU6050, que muestra los 3 ejes de inclinación, más la temperatura del Giroscopio.
+  y se arreglan y ordenan los Serial.print
+
+  11/04/2020 Corrijo el código según las instrucciones de mi amigo Atilano Belinchón
+
+  13/04/2020 Corrijo las lecturas y envío de datos del sensor de infrarrojos E18D80NK
+
+  18/04/2020 Se cambian algunos " if ", por " else if ", para darle agilidad al código
+
+  Entre el día 24/03/2020 y el día 28/04/2020, se hacen varios cambios en el código para mejorarlo y conseguir que el mando funcione,
+  Siguiendo las instrucciones de Bigbadbob en las publicaciones del foro
+
+  http://www.homebuiltrovs.com/rovforum/viewtopic.php?f=18&t=1908
+
+  A partir de la página 4
+
+  28/04/2020 Se corrige la ortografía de todo el texto que no son órdenes
+
+  03/05/2020 Se cambian las asignaciones de los pines, según el código de Github
+
+  Las nuevas asignaciones de pines son:
+
+  Salida de 3.3V a PIN rojo PS2
+  Pin 24 a PIN amarillo PS2 + resistencia 1k
+  Pin 23 a PIN naranja PS2
+  Pin 25 a PIN marrón PS2 + resistencia 1k
+  Pin 22 a PIN azul PS2
+
+  Se arregla el código para que me salga en el Maestro el estado de los focos, encendidos / apagados.
+
+  04/05/2020 Se depura el código según los consejos de Bigbadbob de http://www.homebuiltrov.com
+
+  05/05/2020 Se incluye la Macro F, en todos los Serial.print, para reducir el consumo de memoria dinámica
+  Según los consejos de Bigbadbob de http://www.homebuiltrov.com, pero me da problemas
+
+  06/05/2020 Se depura el código para un mejor funcionamiento, según los consejos de Bigbadbob de http://www.homebuiltrov.com
+  y siguen los problemas con la Macro F
+
+  07/05/2020 Se depura el código para un mejor funcionamiento, según los consejos de Bigbadbob de http://www.homebuiltrov.com
+  y siguen los problemas con la Macro F
+
+  08/05/2020 Se corrigen los problemas de la Macro F, en todos los Serial.print de texto fijo
+  No se puede poner la Macro F, a los Serial.print de datos de los sensores
+  Y se consigue reducir el consumo de memoria dinámica considerablemente
+
+  09/05/2020 Se siguen corrigiendo líneas para la depuración del código, según los consejos de Bigbadbob de http://www.homebuiltrov.com
+  Pero siguen los problemas con el mando de la PS2
+
+  10/05/2020 Me doy cuenta de un error en la orden de encender los focos y lo corrijo
+  Pero el mando sigue sin funcionar como es debido
+
+  11/05/2020 Se modifican varias órdenes del control de los botones, pero el mando sigue sin funcionar correctamente
+
+  16/05/2020 Se hacen diversos cambios, segun los consejos de Tsanshon de www.foromodelismonaval.es
+
+
+
+
+
+
+
+
+  La versión original tomada como punto de partida es la siguiente
+
+  ROVPS2Control_Master8.ino
+  Hamish Trolove - 30 de marzo de 2016
+  www.techmonkeybusiness.com
+
+  Y toma comandos de control de un mando PS2 y transmite los
+  Comandos que utilizan la Biblioteca EasyTransfer de Bill Porter en un serial de 9600 baudios
+  Enlace (100m de cable).
+
+  Este boceto está diseñado para un Arduino Nano con un solo puerto serie.
+
+  Aunque yo lo estoy usando en un Mega 2560 y funcionaba, hasta que empece a introducir sensores.
+
+
+
+  Para la transmisión del video asesorplaza1 utilizara una Raspberry Pi 3 plus, una cámara USB, y el programa VCL Media Player
+  Indicador de luces principales de Pin D4 a LED
+  Sensor D5 a LED ROV Batería De bajo voltaje Advertencia
+  Pin D6 a LED ROV Advertencia interior de alta temperatura
+
+  Comunicaciones cambiado por Asesorplaza1, el 26/03/2020, para separar los datos que se envían de un Arduino a otro, de los datos del Monitor Serie
+
+  Conexión serie: Parte superior 19 (TX) a ROV 18 (RX)
+  Conexión serie: Parte superior 18 (RX) a ROV 19 (TX)
+  Conecte el GND en ambos
+
+  La pantalla LCD de 16x2, se cambiara por una pantalla Nextion básica de 5"
+
+  La codificación tira de la biblioteca PSX desarrollada por Bill Porter.
+  Vea www.billporter.info para consultar lo último de Bill Porter y descargar las bibliotecas.
+
+  Los controles para el ROV son;
+  Stick Derecho - Eje X - Movimiento, Adelante / Atras
+  Stick Derecho - Eje Y - Movimiento, Derecha / Izquierda
+  Botón R1 movimiento arriba
+  Botón R2 movimiento abajo
+  Botón Izquierda - Izquierda, interruptor de encendido/apagado de Focos Externos
+
+*/
+
+
+#include <arduino.h>
+#include <PS2X_lib.h> // Librería PS2 de Bill Porter
+#include <EasyTransfer.h> // Librería Easy Transfer de Bill Porter
+
+PS2X ps2x;         // Crea la clase del controlador PS2
+int error = 0;     // Crea la clase de error del mando
+byte type = 0;     // Crea el tipo de error del mando
+byte vibrate = 0;  // Crea la vibracion del mando
+
+EasyTransfer ETin, ETout;  //Cree los objetos de EasyTransfer para la comunicación bidireccional
+
+const int grnLEDpin = 30;       // LED verde    esta encendido en pin Digital 4
+const int redLEDpin = 31;       // LED rojo     esta encendido en pin Digital 3
+const int yelLEDpin = 32;       // LED amarillo esta encendido en pin Digital 2
+const int VwarnLEDpin = 33;     // LED de advertencia de voltaje esta encendido en el Pin digital D5
+const int TwarnLEDpin = 34;     // LED de advertencia de temperatura esta encendido en el pin D6
+const int pinLedColision = 35;  // LED de advertencia de peligro colisión en el pin 27
+const int LowBatVolts10 = 96;   // esto es para mantener el valor de advertencia de voltaje de bateria bajo en el umbral de x10.
+
+int ForwardVal = 0;             // valor leído en palo PS2 derecho arriba/abajo
+int YawLeftVal = 0;             // valor leído en palo PS2 derecho derecha/izquierda
+int UpVal = 0;                  // valor leído en palo PS2 izquierdo arriba/abajo
+int RollLeftVal = 0;            // valor leído en palo PS2 izquierdo derecha/izquierda
+
+boolean PSB_PAD_UPstate = false;     // Genera variable para guardar y mandar los datos del botón Izquierda arriba al Esclavo
+boolean PSB_PAD_DOWNstate = false;   // Genera variable para guardar y mandar los datos del botón Izquierda abajo al Esclavo
+boolean PSB_PAD_LEFTstate = false;   // Genera variable para guardar y mandar los datos del botón Izquierda izquierdo al Esclavo
+boolean PSB_PAD_RIGHTstate = false;  // Genera variable para guardar y mandar los datos del botón Izquierda derecho al Esclavo
+boolean PSB_BLUEstate = false;       // Genera variable para guardar y mandar los datos del botón Cruz azul al Esclavo
+boolean PSB_GREENstate = false;      // Genera variable para guardar y mandar los datos del botón Triangulo verde al Esclavo
+boolean PSB_PINKstate = false;       // Genera variable para guardar y mandar los datos del botón Cuadrado rosa al Esclavo
+boolean PSB_REDstate = false;        // Genera variable para guardar y mandar los datos del botón Circulo rojo al Esclavo
+boolean PSB_L1state = false;         // Genera variable para guardar y mandar los datos del botón Izquierda delante arriba al Esclavo
+boolean PSB_L2state = false;         // Genera variable para guardar y mandar los datos del botón Izquierda delante abajo al Esclavo
+boolean PSB_L3state = false;         // Genera variable para guardar y mandar los datos del botón Palo izquierdo abajo al Esclavo
+boolean PSB_R1state = false;         // Genera variable para guardar y mandar los datos del botón Derecha delante arriba al Esclavo
+boolean PSB_R2state = false;         // Genera variable para guardar y mandar los datos del botón Derecha delante abajo al Esclavo
+boolean PSB_R3state = false;         // Genera variable para guardar y mandar los datos del botón Palo derecho abajo al Esclavo
+
+float ROVTMP = 0;                                  // Variable para recibir los datos de la temperatura interior del ROV
+float ROVTMP1 = 0;                                 // Variable para recibir los datos de la temperatura motor derecho del ROV
+float ROVTMP2 = 0;                                 // Variable para recibir los datos de la temperatura motor izquierdo del ROV
+float ROVDHThumid;                                 // Variable para recibir los datos de la humedad interior del ROV
+float ROVDHThumid1;                                // Variable para recibir los datos de la humedad del motor derecho del ROV
+float ROVDHThumid2;                                // Variable para recibir los datos de la humedad del motor izquierda del ROV
+float AccX, AccY, AccZ, Temp, GyroX, GyroY, GyroZ; // Variable para recibir los datos del Giroscopio del ROV
+float E18D80NK;                                    // Variable para recibir los datos del sensor E18D80NK del ROV
+float sensorDS18B20;                               // Variable para recibir los datos del sensor DS18B20 del ROV
+float pressure_bar;                                // Variable para recibir los datos del sensor de presión interior SKU237545 en Bares del ROV
+float pressure_psi;                                // Variable para recibir los datos del sensor de presión interior SKU237545 en PSI del ROV
+float pressure_bar1;                               // Variable para recibir los datos del sensor de presión exterior SKU237545 en Bares del ROV
+float pressure_psi1;                               // Variable para recibir los datos del sensor de presión interior SKU237545 en PSI del ROV
+float ROVDepth;                                    // Variable para recibir los datos de la profundidad a la que se encuentra el ROV
+float ROVHDG;                                      // Variable para recibir los datos de la dirección del ROV en grados
+
+struct RECEIVE_DATA_STRUCTURE  // estructura de mensaje de datos recibidos de los sensores
+{
+  int BattVolt;             // Recibe mensaje de voltaje de batería
+  int t;                    // Recibe mensaje de temperatura interior del ROV
+  int t1;                   // Recibe mensaje de temperatura del motor derecho
+  int t2;                   // Recibe mensaje de temperatura del motor izquierdo
+  int ROVDepth;             // Recibe mensaje de lectura de profundidad de ROV (m)
+  int ROVHDG;               // Recibe mensaje de Dirección del ROV (grados)
+  int h;                    // Recibe mensaje de humedad del interior del ROV
+  int h1;                   // Recibe mensaje de humedad del motor derecho
+  int h2;                   // Recibe mensaje de humedad del motor izquierdo
+  int AccX;                 // Recibe mensaje de datos de inclinación del eje X
+  int AccY;                 // Recibe mensaje de datos de inclinación del eje Y
+  int AccZ;                 // Recibe mensaje de datos de inclinación del eje Z
+  int Temp;                 // Recibe mensaje de datos de temperatura del giroscopio
+  int GyroX;                // Recibe mensaje de datos de aceleración en el eje X
+  int GyroY;                // Recibe mensaje de datos de aceleración en el eje Y
+  int GyroZ;                // Recibe mensaje de datos de aceleración en el eje Z
+  int E18D80NK;             // Recibe mensaje de lectura del sensor infrarrojo E18-D80NK
+  int pinLedColision;       // Recibe mensaje de encender alarma de colisión
+  int sensorDS18B20;        // Recibe mensaje de lectura del sensor de temperatura DS18B20
+  int pressure_bar;         // Recibe mensaje de lectura del sensor de presión SKU237545 en Bares
+  int pressure_psi;         // Recibe mensaje de lectura del sensor de presión SKU237545 en PSI
+  int pressure_bar1;        // Recibe mensaje de lectura del sensor de presión SKU237545 Interno en Bares
+  int pressure_psi1;        // Recibe mensaje de lectura del sensor de presión SKU237545 Interno en PSI
+};
+
+struct SEND_DATA_STRUCTURE  // estructura de mensaje de datos enviados
+{
+  int upLraw = 0;  //Variables para transportar los datos reales sin procesar de los ESCs
+  int upRraw = 0;
+  int HLraw = 0;
+  int HRraw = 0;
+  volatile boolean PSB_PAD_UPstate;     // Manda lectura del botón Izquierda arriba al Esclavo
+  volatile boolean PSB_PAD_DOWNstate;   // Manda lectura del botón Izquierda abajo al Esclavo
+  volatile boolean PSB_PAD_RIGHTstate;  // Manda lectura del botón Izquierda derecho al Esclavo
+  volatile boolean PSB_PAD_LEFTstate;   // Manda lectura del botón Izquierda Izquierda al Esclavo
+  volatile boolean PSB_BLUEstate;       // Manda lectura del botón Cruz azul al Esclavo
+  volatile boolean PSB_GREENstate;      // Manda lectura del botón Triangulo verde al Esclavo
+  volatile boolean PSB_PINKstate;       // Manda lectura del botón Cuadrado rosa al Esclavo
+  volatile boolean PSB_REDstate;        // Manda lectura del botón Circulo rojo al Esclavo
+  volatile boolean PSB_L1state;         // Manda lectura del botón Izquierda delante arriba al Esclavo
+  volatile boolean PSB_L2state;         // Manda lectura del botón Izquierda delante abajo al Esclavo
+  volatile boolean PSB_L3state;         // Manda lectura del botón Palo izquierdo abajo al Esclavo
+  volatile boolean PSB_R1state;         // Manda lectura del botón Derecha delante arriba al Esclavo
+  volatile boolean PSB_R2state;         // Manda lectura del botón Derecha delante abajo al Esclavo
+  volatile boolean PSB_R3state;         // Manda lectura del botón Palo derecho abajo al Esclavo
+  volatile boolean LEDHdlts;            // Manda que hacer con los Focos, encendidos/apagados
+};
+
+//dar un nombre al grupo de datos
+RECEIVE_DATA_STRUCTURE rxdata;
+SEND_DATA_STRUCTURE txdata;
+
+unsigned long a = millis();  // Se define y se inicia una variable llamada millis
+
+void setup()
+{
+
+  Serial.begin(9600);      // Comienza la Comunicación en Serie para hablar con el ordenador a 9600 Baudios
+  Serial1.begin(9600);    // Comienza la comunicación Serie en el puerto 1, pines 18 y 19, para hablar con el Arduino Esclavo
+  Serial1.flush();         // Depura la información del Puerto Serie
+  ETin.begin(details(rxdata), &Serial1);    // Comienza la recepción de datos a través de Serial, en los pines 18 y 19
+  ETout.begin(details(txdata), &Serial1);   // Comienza el envío de datos a través de Serial, en los pines 18 y 19
+
+  pinMode(grnLEDpin, OUTPUT);  //se establece grnLEDpin como salida
+  pinMode(redLEDpin, OUTPUT);  //se establece redLEDpin como salida
+  pinMode(yelLEDpin, OUTPUT);  //se establece yelLEDpin como salida
+  pinMode(VwarnLEDpin, OUTPUT);  //se establece el pin de advertencia de batería baja como salida
+  pinMode(TwarnLEDpin, OUTPUT);  //se establece el pin de sobre temperatura como salida
+
+  // Pines y ajustes de configuración: GamePad(clock, command, attention, data, Pressures?, Rumble?)
+  error = ps2x.config_gamepad(22, 23, 24, 25, false, false);
+
+  if (error == 0)
+  {
+    Serial.println (F("\n Controlador encontrado y configurado con éxito"));
+  }
+
+  else if (error == 1)
+    Serial.println (F(" \n No se encontró el controlador, verifique el cableado, consulte readme.txt para habilitar la depuración. Visite www.billporter.info para obtener sugerencias para la solución de problemas"));
+
+  else if (error == 2)
+    Serial.println (F(" \n El controlador se encontró, pero no admite comandos. Consulte readme.txt para habilitar la depuración. Visite www.billporter.info para obtener sugerencias para la solución de problemas"));
+
+  else if (error == 3)
+    Serial.println (F(" \n El controlador se niega a ingresar en el modo de presiones, puede que no lo admita"));
+
+  // Serial.print(ps2x.Analog(1), HEX);
+  type = ps2x.readType();
+}
+
+void loop()
+{
+
+
+if (millis() > a + 100) {
+
+
+  if (error == 0)
+  {
+    // Controlador DualShock
+    ps2x.read_gamepad();
+
+    //lecturas analógicas del palo
+    //traduce las lecturas del palo al las instrucciones del ESC
+    //las lecturas de los palos del controlador PS2 son de 0 a 255
+    //con el neutro en 128. Las posiciones cero son
+    //a la izquierda para movimientos del eje X y arriba para los movimientos del eje Y
+
+    ForwardVal = ps2x.Analog(PSS_RY);
+    YawLeftVal = ps2x.Analog(PSS_RX);
+    UpVal = ps2x.Analog(PSS_LY);
+    RollLeftVal = ps2x.Analog(PSS_LX);
+
+    // Lectura de todos los botones del mando
+    // Esto será verdad hasta que algún botón cambie de estado, (activado / desactivado)
+    if (ps2x.NewButtonState())
+    {
+      if (ps2x.ButtonPressed(PSB_PAD_UP))                // Lee el valor del botón Izquierda arriba al Esclavo
+      {
+        PSB_PAD_UPstate = (!PSB_PAD_UPstate);            // Guarda el dato del botón en su variable
+        digitalWrite(yelLEDpin, PSB_PAD_UPstate);        // Enciende el LED Amarillo
+      }
+      txdata.PSB_PAD_UPstate = (PSB_PAD_UPstate);        // Manda el estado del botón al Esclavo
+
+      if (ps2x.ButtonPressed(PSB_PAD_DOWN))              // Lee el valor del botón Izquierda abajo al Esclavo
+      {
+        PSB_PAD_DOWNstate = (!PSB_PAD_DOWNstate);            // Guarda el dato del botón en su variable
+        digitalWrite(yelLEDpin, PSB_PAD_DOWNstate);      // Enciende el LED Amarillo
+      }
+      txdata.PSB_PAD_DOWNstate = (PSB_PAD_DOWNstate);    // Manda el estado del botón al Esclavo
+
+      if (ps2x.ButtonPressed(PSB_PAD_RIGHT))             // Lee el valor del botón Izquierda derecho al Esclavo
+      {
+        PSB_PAD_RIGHTstate = (!PSB_PAD_RIGHTstate);      // Guarda el dato del botón en su variable
+        digitalWrite(yelLEDpin, PSB_PAD_RIGHT);          // Enciende el LED Amarillo
+      }
+      txdata.PSB_PAD_RIGHTstate = (PSB_PAD_RIGHTstate);  // Manda el estado del botón al Esclavo
+
+      if (ps2x.Button(PSB_PAD_LEFT))                     // Lee el valor del botón Izquierda Izquierda al Esclavo
+      {
+        PSB_PAD_LEFTstate = (!PSB_PAD_LEFTstate);        // Lectura del estado del botón
+        txdata.LEDHdlts = PSB_PAD_LEFTstate;             // Guarda que hacer con el estado de los focos, encendido / apagado
+        digitalWrite(yelLEDpin, PSB_PAD_LEFTstate);      // Enciende el Led Amarillo
+        Serial.print (F("\n Focos apagados"));           // Imprime la frase "Focos apagados"
+      }
+      else if (!txdata.LEDHdlts)
+      {
+        digitalWrite(yelLEDpin, LOW);                    // Apaga el led amarillo
+        Serial.print (F("\n Focos encendidos"));         // Imprime la frase " Focos encendidos"
+      }
+
+      txdata.PSB_PAD_LEFTstate = (PSB_PAD_LEFTstate);    // Manda el estado del botón al Esclavo
+
+      if (ps2x.ButtonPressed(PSB_BLUE))                  // Lee el valor del botón Cruz azul
+      {
+        PSB_BLUEstate = (!PSB_BLUEstate);                // Guarda el dato del botón en su variable
+        digitalWrite(yelLEDpin, PSB_BLUEstate);          // Enciende el Led Amarillo
+      }
+      txdata.PSB_BLUEstate = (PSB_BLUEstate);            // Manda el estado del botón al Esclavo
+
+      if (ps2x.ButtonPressed(PSB_GREEN))                 // Lee el valor del botón Triangulo verde
+      {
+        PSB_GREENstate = (!PSB_GREENstate);              // Guarda el dato del botón en su variable
+        digitalWrite(yelLEDpin, PSB_GREENstate);         // Enciende el LED Amarillo
+      }
+      txdata.PSB_GREENstate = (PSB_GREENstate);          // Manda el estado del botón al Esclavo
+
+      if (ps2x.ButtonPressed(PSB_PINK))                  // Lee el valor del botón Cuadrado rosa
+      {
+        PSB_PINKstate = (!PSB_PINKstate);                // Guarda el dato del botón en su variable
+        digitalWrite(yelLEDpin, PSB_PINKstate);          // Enciende el LED Amarillo
+      }
+      txdata.PSB_PINKstate = (PSB_PINKstate);            // Manda el estado del botón al Esclavo
+
+      if (ps2x.ButtonPressed(PSB_RED))                   // Lee el valor del botón Circulo rojo
+      {
+        PSB_REDstate = (!PSB_REDstate);                  // Guarda el dato del botón en su variable
+        digitalWrite(yelLEDpin, PSB_REDstate);           // Enciende el LED Amarillo
+      }
+      txdata.PSB_REDstate = (PSB_REDstate);              // Manda el estado del botón al Esclavo
+
+      if (ps2x.ButtonPressed(PSB_L3))                    // Lee el valor del botón Palo izquierdo abajo
+      {
+        PSB_L3state = (!PSB_L3state);                    // Guarda el dato del botón en su variable
+        digitalWrite(yelLEDpin, PSB_L3state);            // Enciende el Led Amarillo
+      }
+      txdata.PSB_L3state = (PSB_L3state);                // Manda el estado del botón al Esclavo
+
+      if (ps2x.ButtonPressed(PSB_R1))                    // Lee el valor del botón Derecha delante arriba
+      {
+        PSB_R1state = (!PSB_R1state);                    // Guarda el dato del botón en su variable
+        digitalWrite(yelLEDpin, PSB_R1state);            // Enciende el Led Amarillo
+      }
+      txdata.PSB_R1state = (PSB_R1state);                // Manda el estado del botón al Esclavo
+
+      if (ps2x.ButtonPressed(PSB_R2))                    // Lee el valor del botón Derecha delante abajo
+      {
+        PSB_R2state = (!PSB_R2state);                    // Guarda el dato del botón en su variable
+        digitalWrite(yelLEDpin, PSB_R2state);            // Enciende el Led Amarillo
+      }
+      txdata.PSB_R2state = (PSB_R2state);                // Manda el estado del botón al Esclavo
+
+      if (ps2x.Button(PSB_R3))                           // Lee el valor del botón Palo derecho abajo
+      {
+        PSB_R3state = (!PSB_R3state);                    // Guarda el dato del botón en su variable
+        digitalWrite(yelLEDpin, PSB_R3state);            // Enciende el Led Amarillo
+      }
+      txdata.PSB_R3state = (PSB_R3state);                // Manda el estado del botón al Esclavo
+
+      if (ps2x.ButtonPressed(PSB_L1))                    // Lee el valor del botón Izquierda delante arriba
+      {
+        PSB_L1state = (!PSB_L1state);                    // Guarda el dato del botón en su variable
+        digitalWrite(yelLEDpin, PSB_L1state);            // Enciende el Led Amarillo
+      }
+      txdata.PSB_L1state = (PSB_L1state);                // Manda el estado del botón al Esclavo
+
+      if (ps2x.ButtonPressed(PSB_L2))                    // Lee el valor del botón Izquierda delante abajo
+      {
+        PSB_L2state = (!PSB_L2state);                    // Guarda el dato del botón en su variable
+        digitalWrite(yelLEDpin, PSB_L2state);            // Enciende el Led Amarillo
+      }
+      txdata.PSB_L2state = (PSB_L2state);                // Manda el estado del botón al Esclavo
+    }
+
+    //variables para transportar los datos en bruto reales para los ESCs y servos
+    txdata.upLraw = (128 - UpVal) - (128 - RollLeftVal) / 2; //esto será hasta un valor de 192
+    txdata.upRraw = (128 - UpVal) + (128 - RollLeftVal) / 2; //esto será hasta un valor de 192
+    txdata.HLraw = -(128 - ForwardVal) + (128 - YawLeftVal); //esto será hasta un valor de 256
+    txdata.HRraw = -(128 - ForwardVal) - (128 - YawLeftVal); //esto será hasta un valor de 256
+    //escala los valores para que sean adecuados para los ESCs y para los Servos
+    //estos valores podrán escribirse directamente en los  ESCs y en los Servos
+    txdata.upLraw = map(txdata.upLraw, -193, 193, 0, 179);
+    txdata.upRraw = map(txdata.upRraw, -193, 198, 0, 179);
+    txdata.HLraw = map(txdata.HLraw, -256, 256, 0, 179);
+    txdata.HRraw = map(txdata.HRraw, -256, 256, 0, 179);
+  }
+
+  // Enviar el mensaje al puerto serie para el Arduino del ROV
+  ETout.sendData();
+
+  for (int i = 0; i < 5; i++) {  // Cambia el estado de enviar / recibir datos cada 5 segundos
+
+  (ETin.receiveData());    // Recibe el mensaje al puerto serie para el Arduino del ROV
+  {
+    if (rxdata.BattVolt < LowBatVolts10)
+      // el factor de 10 se incluye para coincidir con el factor 10 utilizado en el valor informado que es un int multiplicado
+      // Por 10 para dar una precisión de 0.1 al valor. Tiene sentido
+    {
+      digitalWrite(VwarnLEDpin, HIGH);
+      //si el voltaje de la batería es demasiado bajo, enciende el LED de advertencia
+    }
+    else
+    {
+      digitalWrite(VwarnLEDpin, LOW);
+      //de lo contrario, si el voltaje está por encima del umbral de bajo voltaje definido
+      //deje el LED apagado
+    }
+
+    ROVTMP = (rxdata.t);    // Recibe los datos del Esclavo
+    ROVTMP1 = (rxdata.t1);  // Recibe los datos del Esclavo
+    ROVTMP2 = (rxdata.t2);  // Recibe los datos del Esclavo
+    //convierte el valor de datos 0-1024 en temperatura
+
+    if (ROVTMP > 50 || ROVTMP1 > 50 || ROVTMP2 > 50)
+    {
+      // Si la temperatura de cualquiera de los sensores DHT22 es demasiado alta (más de 50 grados C)
+      // enciende el LED de advertencia
+      digitalWrite(TwarnLEDpin, HIGH);
+      Serial.print (F(" \n TEMPERATURA ELEVADA !"));
+    }
+    else
+    {
+      digitalWrite(TwarnLEDpin, LOW);
+      Serial.print (F(" \n Temperatura Normal"));
+      // De lo contrario, si la temperatura interior está en un nivel aceptable
+      // Deje el LED apagado y deje el relé de la bomba de refrigeración apagado
+    }
+
+    ROVDHThumid = (rxdata.h);    // Recibe los datos del Esclavo
+    ROVDHThumid1 = (rxdata.h1);  // Recibe los datos del Esclavo
+    ROVDHThumid2 = (rxdata.h2);  // Recibe los datos del Esclavo
+
+    if (rxdata.E18D80NK > 0)    // Si la entrada del E18D80NK es baja, no hay ningún objeto
+    {
+      digitalWrite(pinLedColision, LOW);    // Apague el LED si no se detecta objeto
+      Serial.print (F(" \n Todo Despejado  !"));   // manda imprimir al Monitor Serie la frase
+    }
+    else                                    // por el contrario, si la entrada del E18D80NK es alta
+    {
+      digitalWrite(pinLedColision, HIGH);   // encienda el LED de Peligro Colisión
+      Serial.print (F(" \n PELIGRO Obstaculo detectado  !")); // manda imprimir la frase
+    }
+
+    ROVDepth = (rxdata.ROVDepth);             // Recibe lectura de profundidad de ROV (m)
+    ROVHDG = (rxdata.ROVHDG);                 // Recibe lectura de Dirección del ROV (grados)
+    AccX = (rxdata.AccX);                     // Recibe lectura de datos de inclinación del eje X
+    AccY = (rxdata.AccY);                     // Recibe lectura de datos de inclinación del eje Y
+    AccZ = (rxdata.AccZ);                     // Recibe lectura de datos de inclinación del eje Z
+    Temp = (rxdata.Temp);                     // Recibe lectura de datos de temperatura del giroscopio
+    GyroX = (rxdata.GyroX);                   // Recibe lectura de datos de aceleración en el eje X
+    GyroY = (rxdata.GyroY);                   // Recibe lectura de datos de aceleración en el eje Y
+    GyroZ = (rxdata.GyroZ);                   // Recibe lectura de datos de aceleración en el eje Z
+    //  pinLedColision = (rxdata.pinLedColision); // Recibe lectura de encender alarma de colisión
+    sensorDS18B20 = (rxdata.sensorDS18B20);   // Recibe lectura de lectura del sensor de temperatura DS18B20
+    pressure_bar = (rxdata.pressure_bar);     // Recibe lectura de lectura del sensor de presión SKU237545 en Bares
+    pressure_psi = (rxdata.pressure_psi);     // Recibe lectura de lectura del sensor de presión SKU237545 en PSI
+    pressure_bar1 = (rxdata.pressure_bar1);   // Recibe lectura de lectura del sensor de presión SKU237545 Interno en Bares
+    pressure_psi1 = (rxdata.pressure_psi1);   // Recibe lectura de lectura del sensor de presión SKU237545 Interno en PSI
+    E18D80NK = (rxdata.E18D80NK);             // Recibe estado del sensor de infrarrojos
+
+
+    // #if DEBUG1 { // CUIDADO CON ESTO, des comentar y cambiar 1 si imprime en Monitor Serie, 0 cero no imprime
+
+
+    // A partir de aquí repito las ordenes de lcd, cambiándolas por Serial
+
+    Serial.print (F("\n Voltaje del ROV = "));
+    Serial.print (float(rxdata.BattVolt) / 10, 1);
+    //factor 10 utilizado para obtener precisión adicional del valor entero y luego se muestra con 1 decimal
+    Serial.print (F(" \n Temperatura del casco = "));
+    Serial.print (ROVTMP);
+    Serial.print (F(" *C "));
+    Serial.print (F(" \n Temperatura motor DR = "));
+    Serial.print (ROVTMP1);
+    Serial.print (F(" *C1 "));
+    Serial.print (F(" \n Temperatura motor IZ = "));
+    Serial.print (ROVTMP2);
+    Serial.print (F(" *C2 "));
+    Serial.print (F(" \n Humedad en el interior del Casco = "));
+    Serial.print (ROVDHThumid);
+    Serial.print (F(" %\t"));
+    Serial.print (F(" \n Humedad en el motor DR = "));
+    Serial.print (ROVDHThumid1);
+    Serial.print (F(" %\t"));
+    Serial.print (F(" \n Humedad en el motor IZ = "));
+    Serial.print (ROVDHThumid2);
+    Serial.print (F(" %\t"));
+    Serial.print (F(" \n Inclinación del eje X del ROV = "));
+    Serial.print (AccX);
+    Serial.print (F(" \n Inclinación del eje Y del ROV = "));
+    Serial.print (AccY);
+    Serial.print (F(" \n Inclinación del eje Z del ROV = "));
+    Serial.print (AccZ);
+    Serial.print (F(" \n Temperatura del Giro MPU6050 = "));
+    Serial.print (Temp / 340.00 + 36.53);
+    Serial.print (F(" \n Aceleración en el eje X del Giro MPU6050 = "));
+    Serial.print (GyroX);
+    Serial.print (F(" \n Aceleración en el eje Y del Giro MPU6050 = "));
+    Serial.print (GyroY);
+    Serial.print (F(" \n Aceleración en el eje Z del Giro MPU6050 = "));
+    Serial.print (GyroZ);
+    Serial.print (F(" \n Profundidad = "));
+    Serial.print (ROVDepth);      // muestra en el Display la profundidad del ROV en metros
+    Serial.print (F(" \n Direccion del ROV = "));
+    Serial.print (ROVHDG);  // muestra la dirección del ROV en una brújula
+    Serial.print (F(" \n Temperatura sensor DS18B20 = "));
+    Serial.print (sensorDS18B20);
+    Serial.print (F(" ºC"));
+    Serial.print (F(" \n Valor del Sensor de Presión Interno =  "));
+    Serial.print (F("   Presión en Bar = "));
+    Serial.print (pressure_bar);
+    Serial.print (F("    bars"));
+    Serial.print (F("  || Presión en PSI = "));
+    Serial.print (pressure_psi);
+    Serial.print (F("    psi"));
+    Serial.print (F(" \n Valor del Sensor de Presión Externo = "));
+    Serial.print (F("   Presión en Bar = "));
+    Serial.print (pressure_bar1);
+    Serial.print (F("    bars"));
+    Serial.print (F("  || Presión en PSI = "));
+    Serial.print (pressure_psi1);
+    Serial.print (F("    psi"));
+    Serial.print (F("\n"));
+  }
+  // } #endif  // des comentar cuando NO quiera imprimir los Serial.print
+
+  }
+}
+}
