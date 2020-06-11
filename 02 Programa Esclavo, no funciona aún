@@ -1,3 +1,4 @@
+/*
 
   Modificado por asesorplaza1 en las diferentes fechas indicadas
   Las primeras pruebas y cambios del código, se iniciaron en 2.016, debido a la cantidad de modificaciones
@@ -110,11 +111,15 @@
   16/05/2020 Se hacen diversos cambios, segun los consejos de Tsanshon de www.foromodelismonaval.es
 
 
-  02/06/2020, Haciendo caso a Tsanshon, instalo el programa Atom mas el complemento Platform-IO, para depurar los programas
+  02/06/2020, Haciendo caso a Tsanshon, instalo el programa Atom más el complemento Platform-IO, para depurar los programas
 
-  06/06/2020, Me registro en el foro Platfor-IO, en busca de soluciones, y me dicen que ya no se da soporte para Atom, por lo que tengo que desinstalar este programa, e instalar Visual Estudio Code, con el complemento Platform-IO
+  06/06/2020, Me registro en el foro Platfor-IO, en busca de soluciones, y me dicen que ya no se da soporte para Atom,
+por lo que tengo que desinstalar este programa, e instalar Visual Estudio Code, con el complemento Platform-IO
  
-  11/06/2020, Después de conseguir que los programas funcionen en VSC + PIO, resulta que no puedo continuar el trabajo, porque no se han actualizado los componentes de VSC + PIO, para Arduino, la mayoría de la gente que utiliza estos programas, también utilizan otras placas, que son las ESP32, con muchas mas posibilidades que Arduino, ya he comprado unas placas de esas, y estoy esperando a que me lleguen, son más baratas que las placas Arduino.
+  11/06/2020, Después de conseguir que los programas funcionen en VSC + PIO, resulta que no puedo continuar el trabajo,
+porque no se han actualizado los componentes de VSC + PIO, para Arduino, la mayoría de la gente que utiliza estos programas,
+también utilizan otras placas, que son las ESP32, con muchas más posibilidades que Arduino, ya he comprado unas placas de esas,
+ y estoy esperando a que me lleguen, son más baratas que las placas Arduino.
 
 
 
@@ -131,8 +136,9 @@
   Hamish Trolove - 30 de marzo de 2016
   www.techmonkeybusiness.com
 
-  Este boceto toma los comandos que se le envían desde la unidad maestra con el controlador PS2 conectado y lo convierte en comandos de motor,
-  Servo comandos, controles de luz, etc. Los datos se envían desde el Arduino (maestro) al ROV (esclavo) utilizando la biblioteca EasyTransfer de Bill Porter a través de un enlace en serie de 9600 baudios (anclaje de 100 m). La biblioteca MS5803_14 es de Luke Miller http://github.com/millerlp
+  Este boceto toma los comandos que se le envían desde la unidad Maestra con el controlador PS2 conectado y lo convierte en comandos de motor,
+  Servo comandos, controles de luz, etc. Los datos se envían desde el Arduino (maestro) al ROV (esclavo) utilizando la biblioteca EasyTransfer de Bill Porter
+a través de un enlace en serie de 9600 baudios (anclaje de 100 m). La biblioteca MS5803_14 es de Luke Miller http://github.com/millerlp
 
   Los datos enviados desde el maestro son configuraciones sin formato para el control ESC.
 
@@ -182,6 +188,7 @@
   En la página www.techmonkeybusiness.com
 
 */
+
 
 
 
