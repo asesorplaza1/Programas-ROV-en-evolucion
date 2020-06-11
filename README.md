@@ -1,8 +1,10 @@
 Los dos primeros programas
 
-01 Programa 02 Programa Esclavo
+01 Programa Maestro
 
-Son para el entorno Arduino
+02 Programa Esclavo
+
+Son para utilizar con el IDE Arduino
 
 El programa llamado
 04 VSC PIO projects
