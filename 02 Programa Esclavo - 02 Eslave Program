@@ -91,7 +91,7 @@ int SensorSKU237545_I = 32;  // Sensor de presión Interno
 int SensorSKU237545_E = 33;  // Sensor de presión Externo
 
 int intervalodatos = 1000;  // Hace que solo se envíen los valores 1 vez por segundo
-// int auxMillis = 0;          // Indica el valor del intervalo de tiempo
+ int auxMillis = 0;          // Indica el valor del intervalo de tiempo
 
 // Se pone toda la estructura de recepción de datos junta
 
