@@ -1,14 +1,4 @@
-/*
-	  Programa Maestro
-	
-	  Modificado por asesorplaza1 en las diferentes fechas indicadas
-	  Las primeras pruebas y cambios del código, se iniciaron en 2.016, debido a la cantidad de modificaciones
-	  A partir de ahora 30/01/2020, se ponen las fechas y los cambios en la descripción del proyecto
-	  Para facilitar la búsqueda de errores en los diferentes cambios del código
-	
-	  30/01/2020 ya se han comentado todas las líneas de control de la cámara y del LCD
-	  Le añado 2 DHT22 y así estarán los 3 que me hacen falta
-	  He borrado varias líneas de control de la cámara que no se va a utilizar
+
 	
 	  01/02/2020 Le añado los controles del giroscopio facilitados por Dea de www.cambatronics.com
 	
@@ -251,59 +241,6 @@
 
   10/05/2020 Me doy cuenta de un error en la orden de encender los focos y lo corrijo
   Pero el mando sigue sin funcionar como es debido
-
-  11/05/2020 Se modifican varias órdenes del control de los botones, pero el mando sigue sin funcionar correctamente
-
-  16/05/2020 Se hacen diversos cambios, segun los consejos de Tsanshon de www.foromodelismonaval.es
-
-
-
-
-
-
-
-
-  La versión original tomada como punto de partida es la siguiente
-
-  ROVPS2Control_Master8.ino
-  Hamish Trolove - 30 de marzo de 2016
-  www.techmonkeybusiness.com
-
-  Y toma comandos de control de un mando PS2 y transmite los
-  Comandos que utilizan la Biblioteca EasyTransfer de Bill Porter en un serial de 9600 baudios
-  Enlace (100m de cable).
-
-  Este boceto está diseñado para un Arduino Nano con un solo puerto serie.
-
-  Aunque yo lo estoy usando en un Mega 2560 y funcionaba, hasta que empece a introducir sensores.
-
-
-
-  Para la transmisión del video asesorplaza1 utilizara una Raspberry Pi 3 plus, una cámara USB, y el programa VCL Media Player
-  Indicador de luces principales de Pin D4 a LED
-  Sensor D5 a LED ROV Batería De bajo voltaje Advertencia
-  Pin D6 a LED ROV Advertencia interior de alta temperatura
-
-  Comunicaciones cambiado por Asesorplaza1, el 26/03/2020, para separar los datos que se envían de un Arduino a otro, de los datos del Monitor Serie
-
-  Conexión serie: Parte superior 19 (TX) a ROV 18 (RX)
-  Conexión serie: Parte superior 18 (RX) a ROV 19 (TX)
-  Conecte el GND en ambos
-
-  La pantalla LCD de 16x2, se cambiara por una pantalla Nextion básica de 5"
-
-  La codificación tira de la biblioteca PSX desarrollada por Bill Porter.
-  Vea www.billporter.info para consultar lo último de Bill Porter y descargar las bibliotecas.
-
-  Los controles para el ROV son;
-  Stick Derecho - Eje X - Movimiento, Adelante / Atras
-  Stick Derecho - Eje Y - Movimiento, Derecha / Izquierda
-  Botón R1 movimiento arriba
-  Botón R2 movimiento abajo
-  Botón Izquierda - Izquierda, interruptor de encendido/apagado de Focos Externos
-
-*/
-
 
 #include <arduino.h>
 #include <PS2X_lib.h> // Librería PS2 de Bill Porter
