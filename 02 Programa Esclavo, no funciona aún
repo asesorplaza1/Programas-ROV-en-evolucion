@@ -1,5 +1,3 @@
-/*
-  Programa Esclavo
 
   Modificado por asesorplaza1 en las diferentes fechas indicadas
   Las primeras pruebas y cambios del código, se iniciaron en 2.016, debido a la cantidad de modificaciones
@@ -112,6 +110,16 @@
   16/05/2020 Se hacen diversos cambios, segun los consejos de Tsanshon de www.foromodelismonaval.es
 
 
+  02/06/2020, Haciendo caso a Tsanshon, instalo el programa Atom mas el complemento Platform-IO, para depurar los programas
+
+  06/06/2020, Me registro en el foro Platfor-IO, en busca de soluciones, y me dicen que ya no se da soporte para Atom, por lo que tengo que desinstalar este programa, e instalar Visual Estudio Code, con el complemento Platform-IO
+ 
+  11/06/2020, Después de conseguir que los programas funcionen en VSC + PIO, resulta que no puedo continuar el trabajo, porque no se han actualizado los componentes de VSC + PIO, para Arduino, la mayoría de la gente que utiliza estos programas, también utilizan otras placas, que son las ESP32, con muchas mas posibilidades que Arduino, ya he comprado unas placas de esas, y estoy esperando a que me lleguen, son más baratas que las placas Arduino.
+
+
+
+
+
 
 
 
@@ -129,13 +137,29 @@
   Los datos enviados desde el maestro son configuraciones sin formato para el control ESC.
 
   Este boceto está diseñado para un Arduino Nano con un solo puerto serie.
+  Yo lo estoy usando en un Mega 2560, y funciona
 
-  Yo lo estoy usando en un Mega 2560, y funcionaba, hasta que empecé a introducir sensores
-
-
+  Las asignaciones de pin son;
+  D13 = pin LED ROJO.
+  D12 = Control de faros
+  D11 = Pasador de puente
+  D8 = ESC Vertical Izquierda
+  D7 = ESC Vertical Derecha
+  D6 = ESC Horizontal Izquierda
+  D5 = ESC Horizontal Derecha
+  D4 = Servo de paso de cámara (anulado en el código de asesorplaza1)
+  D3 = Disparador de video (anulado en el código de asesorplaza1)
+  D2 = Disparador de foto  (anulado en el código de asesorplaza1)
   Para la transmisión del video asesorplaza1 utilizara una Raspberry Pi 3 plus, una cámara USB, y el programa VCL Media Player
 
+  A7 = Conexión del divisor de voltaje
+  A6 = Pin de salida del sensor de temperatura TMP36 (se cambia este sensor por obsoleto, se usan los sensores DHT22)
+
+  Pines GND del bus i2c en los sensores MS5803-14BA y BMP180 a pines Nano GND Pines Vcc en los sensores MS5803-14BA y BMP180 a pines Nano 3.3V pines
+  SDA en los sensores MS5803-14BA y BMP180 a pines Nano A4 pines SCL en MS5803-14BA y BMP180 sensores para pin Nano A5
   Se cambian estos sensores por obsoletos, se usan los sensores DHT22 y el giroscopio MPU6050
+
+  5V = Suministro al sensor de temperatura TMP36. (Se cambia este sensor por obsoleto, se usan los sensores DHT22)
 
   Conexión serial de comunicaciones: modificado por Asesorplaza1, el 26/03/2020, para separar los datos mandados entre Arduinos, de los datos a mandar al Monitor serie
   19 superior (TX) a ROV 18 (RX) Conexión serial: 18 superior (RX) a ROV 19 (TX)
@@ -147,7 +171,9 @@
   Para su visualización en una pantalla LCD de 16x2.
   La pantalla LCD de 16x2, se cambiara por una pantalla Nextion básica de 5"
 
-  Se cambia este sensor por obsoleto, se usa el giroscopio MPU 6050
+  El encabezado es de una brújula digital HMC5883L (dirección i2c 0x1E)
+  Y la profundidad de un sensor de alta presión MS5803-14BA (dirección i2c 0x76)
+  (Se cambia este sensor por obsoleto, se usa el giroscopio MPU 6050)
 
   Ver también como se desarrolla el proyecto original con los siguientes códigos:
   HoryzonTrigger.ino, ROVPS2Control_Masterv0.ino,
