@@ -1,3 +1,15 @@
+Los dos primeros programas
+
+01 Programa Maestro
+02 Programa Esclavo
+
+Son para el entorno Arduino
+
+El programa llamado
+04 VSC PIO projects
+
+Es para utilizar con el programa Visual Studio Code más el complemento Platform-IO
+
 En este repositorio, voy a publicar las modificaciones hechas a los programas para controlar un ROV, comenzó los programas con el IDE de Arduino, y con dos placas Arduino Mega 2560, pero en vista del tamaño y la complicación de los códigos, ahora estoy usando Visual Studio Code, con Platfor IO, y posiblemente tengamos que cambiar de placas por dos ESP32, dados los problemas que se me plantean con la depuración de los códigos.
 Como bien pone en el título del repositorio, estos programas irán evolucionando y cambiando, según valla progresando en la depuración de los códigos como de los dos programas.
 Los programas ahora mismo, compilan con el IDE Arduino, pero no operan todo lo bien que tienen problemas, por eso él puso en el título de los programas, "no funcionan aún", espero poder resolver todos los problemas en breve.
@@ -68,7 +80,7 @@ También se incluye el segundo sensor de presión
 
 13/04/2020 Corrijo las lecturas y envió de datos del sensor de infrarrojos E18D80NK
 
-15/04/2020 Se incluye el servo de dirección para accionarlo con los botones R1 y R2 del mando según información obtenida de la pagina
+15/04/2020 Se incluye el servo de dirección para accionarlo con los botones R1 y R2 del mando según información obtenida de la página
 
 https://arduparatodos.blogspot.com/2017/02/controlar-servomotor-con-arduino-varios.html
 
@@ -113,7 +125,7 @@ Y se consigue reducir el consumo de memoria dinámica considerablemente
 
 11/05/2020 Se modifican varias órdenes del control de los botones, pero el mando sigue sin funcionar correctamente
 
-16/05/2020 Se hacen diversos cambios, segun los consejos de Tsanshon de www.foromodelismonaval.es
+16/05/2020 Se hacen diversos cambios, según los consejos de Tsanshon de www.foromodelismonaval.es
 
 02/06/2020, Haciendo caso a Tsanshon, instalo el programa Atom más el complemento Platform-IO, para depurar los programas
 
@@ -159,7 +171,10 @@ Se cambian estos sensores por obsoletos, se usan los sensores DHT22 y el girosco
 5V = Suministro al sensor de temperatura TMP36. (Se cambia este sensor por obsoleto, se usan los sensores DHT22)
 
 Conexión serial de comunicaciones: modificado por Asesorplaza1, el 26/03/2020, para separar los datos mandados entre Arduinos, de los datos a mandar al Monitor serie
-Pin 19 Arduino de Control (TX) a ROV 18 (RX) Conexión serial: 18 Arduino de Control (RX) a ROV 19 (TX)
+Conexión serial: 
+
+Pin 19 Arduino de Control (TX) a Pin 18 Arduino ROV (RX) 
+Pin 18 Arduino de Control (RX) a Pin 19 Arduino ROV (TX)
 Conecte el GND en ambos
 
 Tenga en cuenta que los ESC ya se habrán programado en este punto del proyecto.
