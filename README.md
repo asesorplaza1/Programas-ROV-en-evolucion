@@ -1,7 +1,6 @@
 Los dos primeros programas
 
-01 Programa Maestro
-02 Programa Esclavo
+01 Programa 02 Programa Esclavo
 
 Son para el entorno Arduino
 
