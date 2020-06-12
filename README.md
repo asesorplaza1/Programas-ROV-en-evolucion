@@ -1,4 +1,4 @@
-Ninguno de los programas, funciona aun como es debido
+Ninguno de los 4 programas, funciona aun como es debido
 
 Los dos primeros programas
 
