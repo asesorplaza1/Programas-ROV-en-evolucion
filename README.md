@@ -15,7 +15,7 @@ Es para utilizar con el programa Visual Studio Code más el complemento Platform
 
 En este repositorio, voy a publicar las modificaciones hechas a los programas para controlar un ROV, comenzó los programas con el IDE de Arduino, y con dos placas Arduino Mega 2560, pero en vista del tamaño y la complicación de los códigos, ahora estoy usando Visual Studio Code, con Platfor IO, y posiblemente tengamos que cambiar de placas por dos ESP32, dados los problemas que se me plantean con la depuración de los códigos.
 Como bien pone en el título del repositorio, estos programas irán evolucionando y cambiando, según valla progresando en la depuración de los códigos como de los dos programas.
-Los programas ahora mismo, compilan con el IDE Arduino, pero no operan todo lo bien que tienen problemas, por eso él puso en el título de los programas, "no funcionan aún", espero poder resolver todos los problemas en breve.
+Los programas ahora mismo, compilan con el IDE Arduino, pero no operan todo lo bien que tienen problemas, por eso él puso en el título de los programas, "no funcionan aún", espero poder resolver todos los problemas en breve
 Os mantendré informados de los cambios, un saludo a todo el mundo.
 
 La versión original tomada como punto de partida es la siguiente
