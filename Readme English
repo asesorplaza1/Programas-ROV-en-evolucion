@@ -5,24 +5,33 @@ They're for the Arduino environment
 The program called
 04 VSC PIO projects
 It is to use with the Visual Studio Code program plus the Platform-IO plugin
-In this repository, I will publish the modifications made to the programs to control a ROV, started the programs with the Arduino IDE, and with two Arduino Mega 2560 boards, but in view of the size and complication of the codes, I am now using Visual Studio Code, with Platfor IO, and we may have to change the boards to two ESP32s, given the problems that arise with the debugging of the codes.
+In this repository, I will publish the modifications made to the programs to control a ROV, started the programs with the Arduino IDE,
+and with two Arduino Mega 2560 boards, but in view of the size and complication of the codes, I am now using Visual Studio Code, with Platfor IO,
+and we may have to change the boards to two ESP32s, given the problems that arise with the debugging of the codes.
 As it says in the title of the repository, these programs will evolve and change, as it progresses in the debugging of the codes as of the two programs.
-The programs right now, compile with the Arduino IDE, but do not operate all the good that they have problems, so he put in the title of the programs, "they do not work yet", I hope to be able to solve all the problems soon.
+The programs right now, compile with the Arduino IDE, but do not operate all the good that they have problems, so he put in the title of the programs,
+"they do not work yet", I hope to be able to solve all the problems soon.
 I will keep you informed of the changes, a greeting to everyone.
 The original version taken as a starting point is as follows
 ------------------------------------ original configuration--------------------------------------------------
 ROVPS2Control_Slavev8. ino
 Hamish Trolove - 30 March 2016
+
 www.techmonkeybusiness.com
+
 This sketch takes commands sent to you from the Master unit with the PS2 controller connected and converts it to motor commands, Servo commands, light controls, and so on. The data is sent from the Arduino (master) to the ROV (slave) using Bill Porter's EasyTransfer library via a 9600 baud (100 m anchor) serial link. The MS5803_14 library is by Luke Miller
+
 http://github.com/millerlp
+
 See also how the original project develops with the following codes:
 HoryzonTrigger.ino, ROVPS2Control_Masterv0.ino,
 ROVDoNothing.ino, ROVSubBv0.ino, DigitalCompassv2.ino,
 PTLoggerv4.ino
 and TMP36_Temperature_Sensor.ino.
 On the
+
 www.techmonkeybusiness.com
+
 page
 Data sent from the master are raw configurations for the ESC control.
 This sketch is designed for an Arduino Nano with a single serial port.
@@ -38,14 +47,15 @@ D5 - Horizontal ESC Right
 D4 - Camera Pass Servo (overridden in advisor codeplaza1)
 D3 - Video trigger (overridden in the pro-de-order code1)
 D2 - Photo Trigger (overridden in the deferred EA code1)
-For the transmission of the video advisorplaza1 will use a Raspberry Pi 3 plus, a USB camera, and the program VCL Media Player
+For the transmission of the video asesorplaza1 will use a Raspberry Pi 3 plus, a USB camera, and the program VCL Media Player
 A7 - Connecting the voltage divider
 A6 - TMP36 temperature sensor output pin (this sensor is changed to obsolete, DHT22 sensors are used)
 GND pins of the i2c bus on MS5803-14BA and BMP180 sensors to Nano GND Pins Vcc pins on MS5803-14BA and BMP180 sensors at Nano 3.3V pins
 SDA on MS5803-14BA and BMP180 sensors to Nano A4 pin sCL pins on MS5803-14BA and BMP180 sensors for Nano A5 pin
 These sensors are changed to obsolete, dhT22 sensors and the MPU6050 gyroscope are used
 5V - Supply to the temperature sensor TMP36. (This sensor is changed to obsolete, DHT22 sensors are used)
-Serial communications connection: modified by Adviserplaza1, 26/03/2020, to separate the data sent between Arduinos, from the data to be sent to the Serial Monitor
+Serial communications connection: modified by asesorplaza1
+26/03/2020, to separate the data sent between Arduinos, from the data to be sent to the Serial Monitor
 Serial connection: 
 Pin 19 Arduino Control (TX) to Pin 18 Arduino ROV (RX) 
 Pin 18 Arduino Control (RX) to Pin 19 Arduino ROV (TX)
@@ -58,15 +68,18 @@ The header is from an HMC5883L digital compass (i2c 0x1E address)
 And the depth of a high pressure sensor MS5803-14BA (direction i2c 0x76)
 (This sensor is changed to obsolete, the MPU 6050 gyroscope is used)
 -----------------------------------------find the original configuration---------------------------------------------
-Modified byplaza advisor1 on the different dates indicated
+Modified by asesorplaza1 on the different dates indicated
 The first tests and code changes were initiated in 2,016, due to the number of modifications
 As of now 30/01/2020, dates and changes are made to the project description
 To make it easier to find errors in different code changes
 30/01/2020 All the control lines of the video camera and LCD have already been commented on
-I add two DHT22 and so will be the 3 that I need, one for the inner temperature of the helmet, and two for each of the protection tubes of the motors, the helmet I will remove it in due course, since with the gyroscope GY MPU6050, I have managed to measure also the temperature, therefore I will have two sensors that indicate the internal temperature of the ROV.
+I add two DHT22 and so will be the 3 that I need, one for the inner temperature of the helmet,
+and two for each of the protection tubes of the motors, the helmet I will remove it in due course, since with the gyroscope GY MPU6050,
+I have managed to measure also the temperature, therefore I will have two sensors that indicate the internal temperature of the ROV.
 I've erased several control lines from the camera that won't be used
 01/02/2020 I add the controls of the MPU6050 gyroscope, provided by Dea to www.cambatronics.com
-02/02/2020 I add the order to read only once X second the DHT22, trick by José Luis to www.cambatronics.com and delete the lines corresponding to the control of the video camera, not used by asesorplaza1, in this modification of the original project
+02/02/2020 I add the order to read only once X second the DHT22, trick by José Luis to www.cambatronics.com and delete the lines corresponding to the control
+of the video camera, not used by asesorplaza1, in this modification of the original project
 04/02/2020 I modify the reading lines of the sensors, because until now I only print in Monitor 
 Series the text, not the data.
 06/02/2020 The code is debugging a bit, and the code header is modified.
@@ -91,7 +104,8 @@ Also included is the second pressure sensor SKU237545
 13/04/2020 I correct the readings and send data from the E18D80NK infrared sensor.
 15/04/2020 The steering servo is included to operate it with the R1 and R2 buttons on the controller according to information obtained from the page
 https://arduparatodos.blogspot.com/2017/02/controlar-servomotor-con-arduino-varios.html
-When pressing R1, the servo tilts the shaft where the motor tubes are located, and the ROV must rise to the surface, pressing R2, the shaft tilts in the opposite direction and the ROV must descend gaining depth.
+When pressing R1, the servo tilts the shaft where the motor tubes are located, and the ROV must rise to the surface, pressing R2,
+the shaft tilts in the opposite direction and the ROV must descend gaining depth.
 18/04/2020 Some "if" are changed to "else if" to give the code agility, following the DEA's instructions
 www.cambatronics.com
 Between 24/03/2020 and 28/04/2020, several code changes are made to improve it and make the controller work, following Bigbadbob's instructions in forum posts
@@ -109,7 +123,8 @@ Pin 22 to PS2 Blue PIN
 Fixed the code to get me out in the Master the state of the spotlights, on/off
 04/05/2020 Code is debugged according to Bigbadbob's advice from 
 http://www.homebuiltrov.com
-05/05/2020 Macro F is included, in all Serial.print, to reduce both the space occupied by the program, and the consumption of dynamic memory, according to the advice of Bigbadbob of https://www.homebuiltrov.com , but gives me problems.
+05/05/2020 Macro F is included, in all Serial.print, to reduce both the space occupied by the program, and the consumption of dynamic memory,
+according to the advice of Bigbadbob of https://www.homebuiltrov.com , but gives me problems.
 06/05/2020 Code is debugged for better performance, according to Bigbadbob's advice from http://www.homebuiltrov.com and follows problems with Macro F
 07/05/2020 Code is debugged for better performance, according to Bigbadbob's advice from http://www.homebuiltrov.com and follows issues with Macro F
 08/05/2020 Fixed Macro F issues in all fixed-text Serial.prints
@@ -119,14 +134,19 @@ And it is possible to reduce the consumption of dynamic memory considerably
 But the problems with the PS2 command continue.
 10/05/2020 I notice an error in the order to turn on the spotlights and correct it. But the controller still doesn't work properly.
 11/05/2020 Several button control commands are modified, but the controller still does not work properly.
-13/05/2020 The control of the motors is modified including the ESC.h library, from the RC_ESC_master file, from here, instead of controlling the ESCs as a servo, is controlled as what they are ESC.
+13/05/2020 The control of the motors is modified including the ESC.h library, from the RC_ESC_master file, from here, instead of controlling the ESCs as a servo,
+is controlled as what they are ESC.
 16/05/2020 Various changes are made, according to Tsanshon's advice from
 www.foromodelismonaval.es
 to expedite the code.
 02/06/2020, Ignoring Tsanshon, I install the Atom program plus the Platform-IO plug-in, to debug the programs
-06/06/2020, I register on the Platfor-IO forum, looking for solutions, and tell me that it is no longer supported for Atom, so I have to uninstall this program, and install Visual Studio Code, with the Platform-IO plugin
-07/06/2020, After getting the programs to work in VSC + PIO, it turns out that I can not continue the work, because the components of VSC + PIO have not been updated, for Arduino, most of the people who use these programs, also use other boards, which are the ESP32, with many more possibilities than Arduino, I have already bought some plates of those, and I am waiting for them to reach me, they are cheaper than the Arduino boards.
-08/06/2020 after many tests and modifications, I get the programs to compile in VSC + PIO, but I can not manage to do much more, since there is no specific library for the PS2 command.
+06/06/2020, I register on the Platfor-IO forum, looking for solutions, and tell me that it is no longer supported for Atom, so I have to uninstall this program,
+and install Visual Studio Code, with the Platform-IO plugin
+07/06/2020, After getting the programs to work in VSC + PIO, it turns out that I can not continue the work, because the components of VSC + PIO have not been updated,
+for Arduino, most of the people who use these programs, also use other boards, which are the ESP32, with many more possibilities than Arduino,
+I have already bought some plates of those, and I am waiting for them to reach me, they are cheaper than the Arduino boards.
+08/06/2020 after many tests and modifications, I get the programs to compile in VSC + PIO, but I can not manage to do much more,
+since there is no specific library for the PS2 command.
 09/06/2020 I get to introduce specific libraries with the help of Maxgerhardt de Platforio forum, according to the publications of the forum
 https://community.platformio.org/t/un-rov-de-agua-dulce-a-sweet-water-rov/14157
 11/06/2020 I register on Github, open a post and upload the codes, which still do not work properly.
