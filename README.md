@@ -16,7 +16,9 @@ Los programas ahora mismo, compilan con el IDE Arduino, pero no operan todo lo b
 Os mantendré informados de los cambios, un saludo a todo el mundo.
 
 La versión original tomada como punto de partida es la siguiente
+
 --------------------------------------------------configuración original-----------------------------------------------
+
 ROVPS2Control_Slavev8.ino
 Hamish Trolove - 30 de marzo de 2016
 www.techmonkeybusiness.com
