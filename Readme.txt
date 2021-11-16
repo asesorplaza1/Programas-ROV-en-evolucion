@@ -235,7 +235,7 @@ Unsigned long auxMillis();
 Aquí lo explica mejor
 https://www.luisllamas.es/multitarea-en-arduino-blink-sin-delay/
 
-
+A partir de Octubre del 2021, empiezo a usar las pestañas del IDE de arduino, para separar  el void setup del programa, de los void loop de cada uno de los sensores y perifericos utilizado en el proyecto.
 
 
 El software se proporciona “tal cual”, sin ningún tipo de garantía ni expresa ni implícita,
